@@ -1,0 +1,8 @@
+ros-dashing-tracetools-launch (0.1.0-1bionic) bionic; urgency=high
+
+  * Add tracing integration into launch
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <fixed-term.christophe.bourquebedard@de.bosch.com>  Wed, 10 Jul 2019 22:00:00 -0000
+
+
