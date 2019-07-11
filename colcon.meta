@@ -1,9 +1,0 @@
-{
-  "names": {
-    "tracetools": {
-      "cmake-args": [
-        "-DWITH_LTTNG=ON",
-      ],
-    },
-  },
-}
