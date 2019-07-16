@@ -7,7 +7,7 @@ package_name = 'tracetools_launch'
 
 setup(
     name=package_name,
-    version='0.1.0',
+    version='0.1.1',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -24,9 +24,13 @@ setup(
     ),
     author='Christophe Bedard',
     author_email='fixed-term.christophe.bourquebedard@de.bosch.com',
-    # url='',
-    keywords=['ROS'],
-    description='Launch integration for tracing',
+    url='https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing',
+    keywords=[],
+    description='Launch integration for tracing.',
+    long_description=(
+        'This package provides a trace action to '
+        'launch tracing through a launch file.'
+    ),
     license='Apache 2.0',
     tests_require=['pytest'],
 )
