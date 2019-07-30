@@ -12,24 +12,24 @@ endif()
 
 find_package(ament_cmake_ros REQUIRED)
 
-option(WITH_LTTNG "Include support for tracing with LTTng" OFF)
-if(WITH_LTTNG)
-  # Try to find LTTng
-  find_package(PkgConfig REQUIRED)
-  pkg_check_modules(LTTNG REQUIRED lttng-ust)
-endif()
-if(LTTNG_FOUND)
-  set(LTTNG_TP_FILES
-    include/tracetools/tp_call.h
-    src/tp_call.c
-  )
-  set(TRACING_ENABLED TRUE)
-  message("LTTng found: tracing enabled")
-elseif(WITH_LTTNG)
-  message("LTTng NOT found: tracing disabled")
+option(TRACETOOLS_DISABLED "Explicitly disable support for tracing with LTTng" OFF)
+if(NOT TRACETOOLS_DISABLED)
+  # Set TRACING_ENABLED if we can find lttng-ust
+  find_package(PkgConfig)
+  if(PkgConfig_FOUND)
+    pkg_check_modules(LTTNG lttng-ust)
+    if(LTTNG_FOUND)
+      set(TRACING_ENABLED TRUE)
+      message("LTTng found: tracing enabled")
+    endif()
+  endif()
 endif()
 
-include_directories(include)
+# store configuration variables for runtime use
+configure_file(include/${PROJECT_NAME}/config.h.in include/${PROJECT_NAME}/config.h)
+
+# add both source and output include, to capture config.h
+include_directories(include ${PROJECT_BINARY_DIR}/include)
 
 # Status checking tool
 add_executable(status
@@ -38,9 +38,6 @@ add_executable(status
   src/utils.cpp
 )
 target_link_libraries(status
-  ${PROJECT_NAME}
-)
-ament_target_dependencies(status
   ${PROJECT_NAME}
 )
 install(TARGETS
@@ -54,7 +51,10 @@ set(SOURCES
   src/utils.cpp
 )
 if(TRACING_ENABLED)
-  list(APPEND SOURCES ${LTTNG_TP_FILES})
+  list(APPEND SOURCES
+    include/tracetools/tp_call.h
+    src/tp_call.c
+  )
 endif()
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
@@ -69,6 +69,10 @@ ament_export_interfaces(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
 install(
   DIRECTORY include/
   DESTINATION include
+)
+install(
+  FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
+  DESTINATION include/${PROJECT_NAME}
 )
 install(
   TARGETS ${PROJECT_NAME}
@@ -92,7 +96,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   # Only build tracetools utils tests if LTTng is enabled and found
-  if(TRACETOOLS_LTTNG_ENABLED)
+  if(TRACING_ENABLED)
     ament_add_gtest(test_utils test/test_utils.cpp)
     if(TARGET test_utils)
       target_link_libraries(test_utils ${PROJECT_NAME} -rdynamic)
