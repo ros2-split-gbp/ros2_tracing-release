@@ -1,0 +1,27 @@
+ros-dashing-tracetools (0.2.0-1bionic) bionic; urgency=high
+
+  * Add option to compile out LTTng entirely
+  * Fix ament_target_dependencies() for tracetools status executable
+  * Remove bash scripts
+  * Enable tracing by default if LTTng is available
+  * Fix test_utils never getting built
+  * Contributors: Christophe Bedard, Ingo Lütkebohle, Tobias Blass
+
+ -- Christophe Bedard <fixed-term.christophe.bourquebedard@de.bosch.com>  Mon, 29 Jul 2019 22:00:00 -0000
+
+ros-dashing-tracetools (0.1.1-1bionic) bionic; urgency=high
+
+  * Disable tracing-related tests by default
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <fixed-term.christophe.bourquebedard@de.bosch.com>  Mon, 15 Jul 2019 22:00:00 -0000
+
+ros-dashing-tracetools (0.1.0-1bionic) bionic; urgency=high
+
+  * Add symbol resolution utils
+  * Add tracepoint definitions and wrapper macro for tracepoint functions
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <fixed-term.christophe.bourquebedard@de.bosch.com>  Wed, 10 Jul 2019 22:00:00 -0000
+
+
