@@ -2,6 +2,16 @@
 Changelog for package tracetools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.3 (2019-08-05)
+------------------
+* Fix Windows warnings
+* Contributors: Christophe Bedard, Ingo Lütkebohle
+
+0.2.2 (2019-08-01)
+------------------
+* Fix Windows linking issues
+* Contributors: Christophe Bedard, Ingo Lütkebohle
+
 0.2.0 (2019-07-30)
 ------------------
 * Add option to compile out LTTng entirely
