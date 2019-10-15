@@ -7,7 +7,7 @@ package_name = 'tracetools_launch'
 
 setup(
     name=package_name,
-    version='0.2.3',
+    version='0.2.8',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -19,7 +19,7 @@ setup(
         'Ingo Lütkebohle'
     ),
     maintainer_email=(
-        'fixed-term.christophe.bourquebedard@de.bosch.com, '
+        'bedard.christophe@gmail.com, '
         'ingo.luetkebohle@de.bosch.com'
     ),
     author='Christophe Bedard',
