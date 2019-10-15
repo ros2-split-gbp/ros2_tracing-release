@@ -2,6 +2,21 @@
 Changelog for package tracetools_read
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.8 (2019-10-14)
+------------------
+* Add is_trace_directory() util function
+* Contributors: Christophe Bedard
+
+0.2.7 (2019-09-09)
+------------------
+* Fix missing ament_xmllint dependency
+* Contributors: Christophe Bedard
+
+0.2.5 (2019-08-15)
+------------------
+* Move babeltrace interface functions to separate file to avoid importing it needlessly
+* Contributors: Christophe Bedard
+
 0.2.3 (2019-08-05)
 ------------------
 * Move tracetools_read.utils to the init file
