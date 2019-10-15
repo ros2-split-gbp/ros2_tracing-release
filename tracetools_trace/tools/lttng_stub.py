@@ -12,15 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for tracing."""
-
-import sys
+"""Stub version of the interface for tracing with LTTng."""
 
 
-def tracing_supported() -> bool:
-    """
-    Check if tracing is supported on this platform.
+def setup(*args, **kwargs) -> None:
+    pass
 
-    It does not mean a tracer is installed.
-    """
-    return sys.platform == 'linux'
+
+def start(*args, **kwargs) -> None:
+    pass
+
+
+def stop(*args, **kwargs) -> None:
+    pass
+
+
+def destroy(*args, **kwargs) -> None:
+    pass
