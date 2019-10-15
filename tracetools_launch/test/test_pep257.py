@@ -1,4 +1,4 @@
-# Copyright 2019 Robert Bosch GmbH
+# Copyright 2017 Open Source Robotics Foundation, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,15 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for tracing."""
+from ament_pep257.main import main
+import pytest
 
-import sys
 
-
-def tracing_supported() -> bool:
-    """
-    Check if tracing is supported on this platform.
-
-    It does not mean a tracer is installed.
-    """
-    return sys.platform == 'linux'
+@pytest.mark.linter
+@pytest.mark.pep257
+def test_pep257():
+    rc = main(argv=[])
+    assert rc == 0, 'Found code style errors / warnings'
