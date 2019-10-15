@@ -1,3 +1,32 @@
+## ros2_tracing (eloquent) - 0.2.8-1
+
+The packages in the `ros2_tracing` repository were released into the `eloquent` distro by running `/usr/bin/bloom-release --rosdistro eloquent --track eloquent ros2_tracing --edit` on `Tue, 15 Oct 2019 16:37:39 -0000`
+
+These packages were released:
+- `ros2trace`
+- `tracetools`
+- `tracetools_launch`
+- `tracetools_read`
+- `tracetools_test`
+- `tracetools_trace`
+
+Version of package(s) in repository `ros2_tracing`:
+
+- upstream repository: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `0.2.8-1`
+
+Versions of tools used:
+
+- bloom version: `0.8.0`
+- catkin_pkg version: `0.4.13`
+- rosdep version: `0.16.1`
+- rosdistro version: `0.7.4`
+- vcstools version: `0.1.42`
+
+
 ## ros2_tracing (dashing) - 0.2.8-1
 
 The packages in the `ros2_tracing` repository were released into the `dashing` distro by running `/usr/bin/bloom-release --rosdistro dashing --track dashing ros2_tracing` on `Tue, 15 Oct 2019 16:28:51 -0000`
