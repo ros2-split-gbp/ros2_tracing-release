@@ -1,0 +1,12 @@
+Source: ros-dashing-ros2trace
+Section: misc
+Priority: extra
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest, ros-dashing-ament-copyright, ros-dashing-ament-flake8, ros-dashing-ament-pep257, ros-dashing-ament-xmllint, ros-dashing-ros2cli, ros-dashing-tracetools-trace, ros-dashing-ros-workspace, python3-all, python3-setuptools
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-dashing-ros2trace
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, ros-dashing-ros2cli, ros-dashing-tracetools-trace, ros-dashing-ros-workspace
+Description: The trace command for ROS 2 command line tools.
