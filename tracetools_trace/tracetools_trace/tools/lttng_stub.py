@@ -12,26 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Example launch file for the Trace action."""
-
-from launch import LaunchDescription
-from launch_ros.actions import Node
-from tracetools_launch.action import Trace
+"""Stub version of the interface for tracing with LTTng."""
 
 
-def generate_launch_description():
-    return LaunchDescription([
-        Trace(
-            session_name='my-tracing-session',
-        ),
-        Node(
-            package='tracetools_test',
-            node_executable='test_ping',
-            output='screen',
-        ),
-        Node(
-            package='tracetools_test',
-            node_executable='test_pong',
-            output='screen',
-        ),
-    ])
+def setup(*args, **kwargs) -> None:
+    pass
+
+
+def start(*args, **kwargs) -> None:
+    pass
+
+
+def stop(*args, **kwargs) -> None:
+    pass
+
+
+def destroy(*args, **kwargs) -> None:
+    pass
