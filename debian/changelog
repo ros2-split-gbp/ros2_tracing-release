@@ -1,0 +1,62 @@
+ros-eloquent-tracetools (0.2.9-1bionic) bionic; urgency=high
+
+  * Set symbols visibility to public for util functions
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Fri, 18 Oct 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.2.8-1bionic) bionic; urgency=high
+
+  * Add overload of get_symbols as a fallback
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 14 Oct 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.2.4-1bionic) bionic; urgency=high
+
+  * Ignore unused tracepoint parameters on Windows
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Wed, 14 Aug 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.2.3-1bionic) bionic; urgency=high
+
+  * Fix Windows warnings
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 05 Aug 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.2.2-1bionic) bionic; urgency=high
+
+  * Fix Windows linking issues
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 01 Aug 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.2.0-1bionic) bionic; urgency=high
+
+  * Add option to compile out LTTng entirely
+  * Fix ament_target_dependencies() for tracetools status executable
+  * Remove bash scripts
+  * Enable tracing by default if LTTng is available
+  * Fix test_utils never getting built
+  * Contributors: Christophe Bedard, Ingo Lütkebohle, Tobias Blass
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Tue, 30 Jul 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.1.1-1bionic) bionic; urgency=high
+
+  * Disable tracing-related tests by default
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Tue, 16 Jul 2019 07:00:00 -0000
+
+ros-eloquent-tracetools (0.1.0-1bionic) bionic; urgency=high
+
+  * Add symbol resolution utils
+  * Add tracepoint definitions and wrapper macro for tracepoint functions
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 11 Jul 2019 07:00:00 -0000
+
+
