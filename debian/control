@@ -1,0 +1,12 @@
+Source: ros-eloquent-tracetools-read
+Section: misc
+Priority: extra
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest, ros-eloquent-ament-copyright, ros-eloquent-ament-flake8, ros-eloquent-ament-pep257, ros-eloquent-ament-xmllint, ros-eloquent-ros-workspace, python3-all, python3-setuptools
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-eloquent-tracetools-read
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, python3-babeltrace, ros-eloquent-ros-workspace
+Description: Tools for reading traces.
