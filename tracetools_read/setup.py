@@ -5,10 +5,12 @@ package_name = 'tracetools_read'
 
 setup(
     name=package_name,
-    version='0.2.10',
+    version='0.2.11',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
+        ('share/ament_index/resource_index/packages',
+            ['resource/' + package_name]),
     ],
     install_requires=['setuptools'],
     maintainer=(
