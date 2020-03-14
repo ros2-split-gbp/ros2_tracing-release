@@ -15,7 +15,6 @@
 """Module for tracing."""
 
 import sys
-from typing import List
 
 
 def tracing_supported() -> bool:
@@ -25,11 +24,3 @@ def tracing_supported() -> bool:
     It does not mean a tracer is installed.
     """
     return sys.platform == 'linux'
-
-
-def print_events_list(
-    events: List[str],
-    prefix: str = '\t',
-) -> None:
-    for event in events:
-        print(f'{prefix}{event}')
