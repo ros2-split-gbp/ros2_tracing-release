@@ -22,7 +22,7 @@ tracks:
     ros_distro: dashing
     vcs_type: git
     vcs_uri: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
-    version: :{auto}
+    version: 0.2.8
   eloquent:
     actions:
     - bloom-export-upstream :{vcs_local_uri} :{vcs_type} --tag :{release_tag} --display-uri
