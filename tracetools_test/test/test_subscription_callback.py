@@ -17,17 +17,17 @@ import unittest
 from tracetools_test.case import TraceTestCase
 
 
-class TestServiceCallback(TraceTestCase):
+class TestSubscriptionCallback(TraceTestCase):
 
     def __init__(self, *args) -> None:
         super().__init__(
             *args,
-            session_name_prefix='session-test-service-callback',
+            session_name_prefix='session-test-subscription-callback',
             events_ros=[
                 'ros2:callback_start',
                 'ros2:callback_end',
             ],
-            nodes=['test_service_ping', 'test_service_pong']
+            nodes=['test_ping', 'test_pong']
         )
 
     def test_all(self):
@@ -38,29 +38,34 @@ class TestServiceCallback(TraceTestCase):
         start_events = self.get_events_with_name('ros2:callback_start')
         for event in start_events:
             self.assertValidHandle(event, 'callback')
-            # Should not be 1 for services (yet)
-            self.assertFieldEquals(
-                event,
-                'is_intra_process',
-                0,
-                'invalid value for is_intra_process')
+            is_intra_process_value = self.get_field(event, 'is_intra_process')
+            self.assertIsInstance(is_intra_process_value, int, 'is_intra_process not int')
+            self.assertTrue(
+                is_intra_process_value in [0, 1],
+                f'invalid value for is_intra_process: {is_intra_process_value}')
 
         end_events = self.get_events_with_name('ros2:callback_end')
         for event in end_events:
             self.assertValidHandle(event, 'callback')
 
-        # Check that there is at least a start/end pair for each node
-        for node in self._nodes:
-            test_start_events = self.get_events_with_procname(node, start_events)
-            test_end_events = self.get_events_with_procname(node, end_events)
-            self.assertGreater(
-                len(test_start_events),
-                0,
-                f'no start_callback events for node: {node}')
-            self.assertGreater(
-                len(test_end_events),
-                0,
-                f'no end_callback events for node: {node}')
+        # Check that a start:end pair has a common callback handle
+        # Note: might be unstable if tracing is disabled too early
+        ping_events = self.get_events_with_procname('test_ping')
+        pong_events = self.get_events_with_procname('test_pong')
+        ping_events_start = self.get_events_with_name('ros2:callback_start', ping_events)
+        pong_events_start = self.get_events_with_name('ros2:callback_start', pong_events)
+        for ping_start in ping_events_start:
+            self.assertMatchingField(
+                ping_start,
+                'callback',
+                'ros2:callback_end',
+                ping_events)
+        for pong_start in pong_events_start:
+            self.assertMatchingField(
+                pong_start,
+                'callback',
+                'ros2:callback_end',
+                pong_events)
 
 
 if __name__ == '__main__':
