@@ -1,0 +1,12 @@
+Source: ros-dashing-tracetools-test
+Section: misc
+Priority: optional
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), pkg-config, python3-pytest, ros-dashing-ament-cmake, ros-dashing-ament-cmake-pytest, ros-dashing-ament-lint-auto, ros-dashing-ament-lint-common, ros-dashing-launch-ros, ros-dashing-rclcpp, ros-dashing-std-msgs, ros-dashing-std-srvs, ros-dashing-tracetools, ros-dashing-tracetools-launch, ros-dashing-tracetools-read, ros-dashing-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-dashing-tracetools-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-dashing-rclcpp, ros-dashing-std-msgs, ros-dashing-std-srvs, ros-dashing-ros-workspace
+Description: Testing utilities and tests for the tracetools package.
