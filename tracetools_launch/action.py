@@ -54,7 +54,7 @@ class Trace(Action):
         **kwargs,
     ) -> None:
         """
-        Create a Trace.
+        Constructor.
 
         :param session_name: the name of the tracing session
         :param append_timestamp: whether to append timestamp to the session name
