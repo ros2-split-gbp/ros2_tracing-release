@@ -14,13 +14,7 @@ endif()
 
 find_package(ament_cmake_ros REQUIRED)
 
-if(WIN32)
-  set(DISABLED_DEFAULT ON)
-else()
-  set(DISABLED_DEFAULT OFF)
-endif()
-option(TRACETOOLS_DISABLED "Explicitly disable support for tracing with LTTng" ${DISABLED_DEFAULT})
-
+option(TRACETOOLS_DISABLED "Explicitly disable support for tracing with LTTng" OFF)
 if(NOT TRACETOOLS_DISABLED)
   # Set TRACING_ENABLED if we can find lttng-ust
   find_package(PkgConfig)
