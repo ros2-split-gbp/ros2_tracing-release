@@ -5,17 +5,15 @@ package_name = 'tracetools_trace'
 
 setup(
     name=package_name,
-    version='0.2.12',
+    version='0.2.8',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
     ],
     install_requires=['setuptools'],
     maintainer=(
         'Christophe Bedard, '
-        'Ingo Luetkebohle'
+        'Ingo Lütkebohle'
     ),
     maintainer_email=(
         'bedard.christophe@gmail.com, '
