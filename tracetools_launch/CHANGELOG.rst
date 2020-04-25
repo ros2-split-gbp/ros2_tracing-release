@@ -2,6 +2,29 @@
 Changelog for package tracetools_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2020-04-24)
+------------------
+* Document what kind of lib_name LdPreload expects
+* Add logs for LdPreload action on success or failure
+* Contributors: Christophe Bedard
+
+0.3.0 (2020-03-04)
+------------------
+* Add logs for trace action init and fini
+* Expose context enabling through CLI and Trace action
+* Extract LdPreload action from Trace action to support preloading any lib
+* Contributors: Christophe Bedard
+
+0.2.12 (2019-12-09)
+-------------------
+* Use imperative mood in constructor docstring.
+* Contributors: Christophe Bedard, Steven! Ragnarök
+
+0.2.11 (2019-12-09)
+-------------------
+* Register Python packages in the ament index
+* Contributors: Christophe Bedard
+
 0.2.7 (2019-09-09)
 ------------------
 * Fix missing ament_xmllint dependency

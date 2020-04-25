@@ -32,7 +32,9 @@ Design document for ROS 2 tracing, instrumentation, and analysis effort.
     2. [Notes on client libraries](#notes-on-client-libraries)
     3. [ROS 1/2 compatibility](#ros-12-compatibility)
 6. [Tools packages](#tools-packages)
-7. [Analysis architecture](#analysis-architecture)
+7. [Analysis](#analysis)
+    1. [Analysis design](#analysis-design)
+    1. [Analysis architecture](#analysis-architecture)
 
 ## Introduction
 
@@ -555,7 +557,7 @@ We could look into making analyses work on both ROS 1 and ROS 2, through a commo
     * wraps the LTTng Python bindings to setup and start a tracing session
     * exposes simplified setup functions with default values
     * provides an example `trace` entrypoint for tracing
-        `$ ros2 run tracetools_trace trace`
+        * `$ ros2 run tracetools_trace trace`
 * `ros2trace`
     * provides a `ros2cli` extension
     `$ ros2 trace`
@@ -577,10 +579,10 @@ We could look into making analyses work on both ROS 1 and ROS 2, through a commo
         * handle and process trace events to gather data
 * `ros2trace_analysis`
     * provides a `ros2cli` extension with verbs
-    `$ ros2 trace-analysis`
-        * uses `tracetools_analysis` functions
-        `$ ros2 trace-analysis convert`
-        `$ ros2 trace-analysis process`
+        * `$ ros2 trace-analysis`
+    * uses/exposes `tracetools_analysis` functions
+        * `$ ros2 trace-analysis convert`
+        * `$ ros2 trace-analysis process`
 
 ```plantuml
 @startuml
@@ -647,9 +649,19 @@ tracetools_analysis <-- ros2trace_analysis
 @enduml
 ```
 
-## Analysis architecture
+## Analysis
 
-With profiling as an example implementation.
+### Analysis design
+
+Generally, for a given trace data analysis objective, the following classes are extended: `EventHandler`, `DataModel`, and `DataModelUtil`.
+
+A user/developer can implement an `EventHandler`, which defines callbacks for specific events. Those callbacks get called by the `Processor`, and end up putting slightly-processed data into a `DataModel`, which is a data container that uses `pandas` `DataFrame`s.
+
+Meaningful data can be extracted from the `DataModel`. However, a `DataModelUtil` can provide common utility functions so that users don't have to re-write them. This meaningful output data can then be presented through a Jupyter notebook (e.g. plots) or a normal Python script (e.g. tables).
+
+### Analysis architecture
+
+With profiling as an example implementation:
 
 ```plantuml
 @startuml
@@ -669,12 +681,11 @@ abstract class Dependant {
  +dependencies(): list {static}
 }
 abstract class EventHandler {
- +handler_map
- +data(): DataModel {abstract}
+ +handler_map(): map
+ +data(): DataModel
  +process(events) {static}
 }
 class ProfileHandler {
- +data(): ProfileDataModel
  +_handle_sched_switch(event, metadata)
  +_handle_function_entry(event, metadata)
  +_handle_function_exit(event, metadata)
@@ -684,6 +695,7 @@ EventHandler <|-- ProfileHandler
 Processor o-- EventHandler
 
 abstract class DataModel {
+ +print_data() {abstract}
 }
 class ProfileDataModel {
  +times: DataFrame
@@ -693,6 +705,7 @@ DataModel <|-- ProfileDataModel
 ProfileDataModel o-- ProfileHandler
 
 abstract class DataModelUtil {
+ +print_data(): DataModel
  +convert_time_columns(df, columns): df {static}
 }
 class ProfileDataModelUtil {

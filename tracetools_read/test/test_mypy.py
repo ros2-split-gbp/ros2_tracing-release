@@ -1,4 +1,4 @@
-# Copyright 2019 Robert Bosch GmbH
+# Copyright 2019 Canonical Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,24 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Module for tracing."""
-
-import sys
-from typing import List
+from ament_mypy.main import main
+import pytest
 
 
-def tracing_supported() -> bool:
-    """
-    Check if tracing is supported on this platform.
-
-    It does not mean a tracer is installed.
-    """
-    return sys.platform == 'linux'
-
-
-def print_names_list(
-    names: List[str],
-    prefix: str = '\t',
-) -> None:
-    for name in names:
-        print(f'{prefix}{name}')
+@pytest.mark.mypy
+@pytest.mark.linter
+def test_mypy():
+    assert main(argv=[]) == 0, 'Found errors'

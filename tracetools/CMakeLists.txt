@@ -14,50 +14,85 @@ endif()
 
 find_package(ament_cmake_ros REQUIRED)
 
-option(TRACETOOLS_DISABLED "Explicitly disable support for tracing with LTTng" OFF)
+if(WIN32)
+  set(DISABLED_DEFAULT ON)
+else()
+  set(DISABLED_DEFAULT OFF)
+endif()
+option(TRACETOOLS_DISABLED "Explicitly disable support for tracing" ${DISABLED_DEFAULT})
+option(TRACETOOLS_NO_RDYNAMIC "Disable export of -rdynamic link flag" OFF)
+
 if(NOT TRACETOOLS_DISABLED)
-  # Set TRACING_ENABLED if we can find lttng-ust
+  # Set TRACETOOLS_LTTNG_ENABLED if we can find lttng-ust
   find_package(PkgConfig)
   if(PkgConfig_FOUND)
     pkg_check_modules(LTTNG lttng-ust)
     if(LTTNG_FOUND)
-      set(TRACING_ENABLED TRUE)
+      set(TRACETOOLS_LTTNG_ENABLED TRUE)
       message("LTTng found: tracing enabled")
     endif()
   endif()
 endif()
 
-# store configuration variables for runtime use
+# Store configuration variables for runtime use
+#   TRACETOOLS_DISABLED
+#   TRACETOOLS_LTTNG_ENABLED
 configure_file(include/${PROJECT_NAME}/config.h.in include/${PROJECT_NAME}/config.h)
-
-# add both source and output include, to capture config.h
-include_directories(include ${PROJECT_BINARY_DIR}/include)
 
 # Tracetools lib
 set(SOURCES
   src/tracetools.c
   src/utils.cpp
 )
-if(TRACING_ENABLED)
+set(HEADERS
+  include/${PROJECT_NAME}/tracetools.h
+  include/${PROJECT_NAME}/utils.hpp
+  include/${PROJECT_NAME}/visibility_control.hpp
+)
+if(TRACETOOLS_LTTNG_ENABLED)
+  # We only need these if we're using LTTng
   list(APPEND SOURCES
-    include/tracetools/tp_call.h
     src/tp_call.c
+  )
+  list(APPEND HEADERS
+    include/${PROJECT_NAME}/tp_call.h
   )
 endif()
 
+# Copy select headers to the actual include/ directory that we will use and export
+foreach(_header ${HEADERS})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/${_header}
+    ${PROJECT_BINARY_DIR}/${_header}
+    COPYONLY
+  )
+endforeach()
+
 add_library(${PROJECT_NAME} ${SOURCES})
-if(TRACING_ENABLED)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC TRACETOOLS_LTTNG_ENABLED)
-  target_link_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES} -ldl)
+if(TRACETOOLS_LTTNG_ENABLED)
+  target_link_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES})
+  # Export -rdynamic for downtream packages to use when calling
+  #   ament_target_dependencies()
+  # which is needed to resolve function addresses to symbols when
+  # using function pointers directly/without std::bind()
+  # (the flag should not be used on Windows, but TRACETOOLS_LTTNG_ENABLED
+  # should never be true on Windows anyway, so there is no need to check)
+  if(NOT TRACETOOLS_NO_RDYNAMIC)
+    target_link_libraries(${PROJECT_NAME} "-rdynamic")
+  endif()
 endif()
 if(WIN32)
-    # Causes the visibility macros to use dllexport rather than dllimport
-    # which is appropriate when building the dll but not consuming it.
-    target_compile_definitions(${PROJECT_NAME}
-      PRIVATE "TRACETOOLS_BUILDING_DLL")
+  # Causes the visibility macros to use dllexport rather than dllimport
+  # which is appropriate when building the dll but not consuming it.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "TRACETOOLS_BUILDING_DLL")
 endif()
 
-ament_export_interfaces(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+# Only use output/binary include directory
+target_include_directories(${PROJECT_NAME} PUBLIC
+  "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
+  "$<INSTALL_INTERFACE:include>"
+)
+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
 
 # Status checking tool
 add_executable(status
@@ -72,12 +107,8 @@ install(TARGETS
 )
 
 install(
-  DIRECTORY include/
+  DIRECTORY ${PROJECT_BINARY_DIR}/include/
   DESTINATION include
-)
-install(
-  FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
-  DESTINATION include/${PROJECT_NAME}
 )
 install(
   TARGETS ${PROJECT_NAME}
@@ -89,26 +120,22 @@ install(
 )
 
 ament_export_include_directories(include)
-if(TRACING_ENABLED)
+if(TRACETOOLS_LTTNG_ENABLED)
   ament_export_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES})
+  # Export -rdynamic for downstream packages using classic CMake variables
+  if(NOT TRACETOOLS_NO_RDYNAMIC)
+    ament_export_link_flags("-rdynamic")
+  endif()
 else()
   ament_export_libraries(${PROJECT_NAME})
 endif()
 
 if(BUILD_TESTING)
-  find_package(ament_cmake_gtest REQUIRED)
+  set(ament_cmake_cppcheck_ADDITIONAL_INCLUDE_DIRS ${LTTNG_INCLUDE_DIRS})
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
-  # Only build tracetools utils tests if LTTng is enabled and found
-  if(TRACING_ENABLED)
-    ament_add_gtest(test_utils test/test_utils.cpp)
-    if(TARGET test_utils)
-      target_link_libraries(test_utils ${PROJECT_NAME} -rdynamic)
-    endif()
-  endif()
 endif()
 
 ament_package()
 
-add_definitions("-D${PROJECT_NAME}_VERSION=\"${${PROJECT_NAME}_VERSION}\"")
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_VERSION="${${PROJECT_NAME}_VERSION}")

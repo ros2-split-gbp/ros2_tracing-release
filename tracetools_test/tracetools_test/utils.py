@@ -21,7 +21,6 @@ from typing import Tuple
 
 from launch import LaunchDescription
 from launch import LaunchService
-from launch_ros import get_default_launch_description
 from launch_ros.actions import Node
 from tracetools_launch.action import Trace
 from tracetools_read import DictEvent
@@ -53,24 +52,25 @@ def run_and_trace(
 
     launch_actions = []
     # Add trace action
-    launch_actions.append(Trace(
-        session_name=session_name,
-        append_timestamp=False,
-        base_path=base_path,
-        events_ust=ros_events,
-        events_kernel=kernel_events
-    ))
+    launch_actions.append(
+        Trace(
+            session_name=session_name,
+            append_timestamp=False,
+            base_path=base_path,
+            events_ust=ros_events,
+            events_kernel=kernel_events,
+        )
+    )
     # Add nodes
     for node_name in node_names:
         n = Node(
             package=package_name,
-            node_executable=node_name,
+            executable=node_name,
             output='screen',
         )
         launch_actions.append(n)
     ld = LaunchDescription(launch_actions)
     ls = LaunchService()
-    ls.include_launch_description(get_default_launch_description())
     ls.include_launch_description(ld)
 
     exit_code = ls.run()

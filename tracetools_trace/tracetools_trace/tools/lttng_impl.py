@@ -14,10 +14,17 @@
 
 """Implementation of the interface for tracing with LTTng."""
 
+from distutils.version import StrictVersion
+import re
+import subprocess
 from typing import List
+from typing import Optional
+from typing import Set
+from typing import Union
 
 import lttng
 
+from .names import CONTEXT_TYPE_CONSTANTS_MAP
 from .names import DEFAULT_CONTEXT
 from .names import DEFAULT_EVENTS_KERNEL
 from .names import DEFAULT_EVENTS_ROS
@@ -25,15 +32,35 @@ from .path import DEFAULT_BASE_PATH
 from .path import get_full_session_path
 
 
+def get_version() -> Union[StrictVersion, None]:
+    """
+    Get the version of the lttng module.
+
+    The module does not have a __version__ attribute, but the version is mentioned in its __doc__,
+    and seems to be written in a consistent way across versions.
+
+    :return: the version as a StrictVersion object, or `None` if it cannot be extracted
+    """
+    doc_lines = lttng.__doc__.split('\n')
+    filtered_doc_lines: List[str] = list(filter(None, doc_lines))
+    if len(filtered_doc_lines) == 0:
+        return None
+    first_line = filtered_doc_lines[0]
+    version_string = first_line.split(' ')[1]
+    if not re.compile(r'^[0-9]+\.[0-9]+\.[0-9]+$').match(version_string):
+        return None
+    return StrictVersion(version_string)
+
+
 def setup(
     session_name: str,
     base_path: str = DEFAULT_BASE_PATH,
-    ros_events: List[str] = DEFAULT_EVENTS_ROS,
-    kernel_events: List[str] = DEFAULT_EVENTS_KERNEL,
-    context_names: List[str] = DEFAULT_CONTEXT,
+    ros_events: Union[List[str], Set[str]] = DEFAULT_EVENTS_ROS,
+    kernel_events: Union[List[str], Set[str]] = DEFAULT_EVENTS_KERNEL,
+    context_names: Union[List[str], Set[str]] = DEFAULT_CONTEXT,
     channel_name_ust: str = 'ros2',
     channel_name_kernel: str = 'kchan',
-) -> None:
+) -> Optional[str]:
     """
     Set up LTTng session, with events and context.
 
@@ -46,7 +73,23 @@ def setup(
     :param context_names: list of context elements to enable
     :param channel_name_ust: the UST channel name
     :param channel_name_kernel: the kernel channel name
+    :return: the full path to the trace directory
     """
+    # Check if there is a session daemon running
+    if lttng.session_daemon_alive() == 0:
+        # Otherwise spawn one without doing any error checks
+        subprocess.run(
+            ['lttng-sessiond', '--daemonize'],
+        )
+
+    # Convert lists to sets
+    if not isinstance(ros_events, set):
+        ros_events = set(ros_events)
+    if not isinstance(kernel_events, set):
+        kernel_events = set(kernel_events)
+    if not isinstance(context_names, set):
+        context_names = set(context_names)
+
     # Resolve full tracing directory path
     full_path = get_full_session_path(session_name, base_path=base_path)
 
@@ -109,11 +152,18 @@ def setup(
 
     # Context
     context_list = _create_context_list(context_names)
-    enabled_handles = [h for h in [handle_ust, handle_kernel] if h is not None]
+    # TODO make it possible to add context in userspace and kernel separately, since some context
+    # types might only apply to userspace OR kernel; only consider userspace contexts for now
+    handles_context = [handle_ust]
+    enabled_handles: List[lttng.Handle] = list(filter(None, handles_context))
     _add_context(enabled_handles, context_list)
 
+    return full_path
 
-def start(session_name: str) -> None:
+
+def start(
+    session_name: str,
+) -> None:
     """
     Start LTTng session, and check for errors.
 
@@ -124,7 +174,9 @@ def start(session_name: str) -> None:
         raise RuntimeError(f'failed to start tracing: {lttng.strerror(result)}')
 
 
-def stop(session_name: str) -> None:
+def stop(
+    session_name: str,
+) -> None:
     """
     Stop LTTng session, and check for errors.
 
@@ -135,7 +187,9 @@ def stop(session_name: str) -> None:
         raise RuntimeError(f'failed to stop tracing: {lttng.strerror(result)}')
 
 
-def destroy(session_name: str) -> None:
+def destroy(
+    session_name: str,
+) -> None:
     """
     Destroy LTTng session, and check for errors.
 
@@ -146,15 +200,17 @@ def destroy(session_name: str) -> None:
         raise RuntimeError(f'failed to destroy tracing session: {lttng.strerror(result)}')
 
 
-def _create_events(event_names_list: List[str]) -> List[lttng.Event]:
+def _create_events(
+    event_names: Set[str],
+) -> List[lttng.Event]:
     """
     Create events list from names.
 
-    :param event_names_list: a list of names to create events for
+    :param event_names: a set of names to create events for
     :return: the list of events
     """
     events_list = []
-    for event_name in event_names_list:
+    for event_name in event_names:
         e = lttng.Event()
         e.name = event_name
         e.type = lttng.EVENT_TRACEPOINT
@@ -163,7 +219,10 @@ def _create_events(event_names_list: List[str]) -> List[lttng.Event]:
     return events_list
 
 
-def _create_session(session_name: str, full_path: str) -> None:
+def _create_session(
+    session_name: str,
+    full_path: str,
+) -> None:
     """
     Create session from name and full directory path, and check for errors.
 
@@ -181,7 +240,10 @@ def _create_session(session_name: str, full_path: str) -> None:
         raise RuntimeError(f'session creation failed: {lttng.strerror(result)}')
 
 
-def _create_handle(session_name: str, domain: lttng.Domain) -> lttng.Handle:
+def _create_handle(
+    session_name: str,
+    domain: lttng.Domain,
+) -> lttng.Handle:
     """
     Create a handle for a given session name and a domain, and check for errors.
 
@@ -196,7 +258,10 @@ def _create_handle(session_name: str, domain: lttng.Domain) -> lttng.Handle:
     return handle
 
 
-def _enable_channel(handle: lttng.Handle, channel: lttng.Channel) -> None:
+def _enable_channel(
+    handle: lttng.Handle,
+    channel: lttng.Channel,
+) -> None:
     """
     Enable channel for a handle, and check for errors.
 
@@ -227,37 +292,41 @@ def _enable_events(
 
 
 context_map = {
-    'procname': lttng.EVENT_CONTEXT_PROCNAME,
-    'pid': lttng.EVENT_CONTEXT_PID,
-    'vpid': lttng.EVENT_CONTEXT_VPID,
-    'vtid': lttng.EVENT_CONTEXT_VTID,
+    name: getattr(lttng, name_constant, None) if name_constant is not None else None
+    for name, name_constant in CONTEXT_TYPE_CONSTANTS_MAP.items()
 }
 
 
-def _context_name_to_type(context_name: str) -> int:
+def _context_name_to_type(
+    context_name: str,
+) -> Union[int, None]:
     """
     Convert from context name to LTTng enum/constant type.
 
     :param context_name: the generic name for the context
-    :return: the associated type
+    :return: the associated type, or `None` if it cannot be found
     """
-    return context_map.get(context_name)
+    return context_map.get(context_name, None)
 
 
-def _create_context_list(context_names_list: List[str]) -> List[lttng.EventContext]:
+def _create_context_list(
+    context_names: Set[str],
+) -> List[lttng.EventContext]:
     """
     Create context list from names, and check for errors.
 
-    :param context_names_list: the list of context names
+    :param context_names: the set of context names
     :return: the event context list
     """
     context_list = []
-    for c in context_names_list:
+    for context_name in context_names:
         ec = lttng.EventContext()
-        context_type = _context_name_to_type(c)
+        context_type = _context_name_to_type(context_name)
         if context_type is not None:
             ec.ctx = context_type
             context_list.append(ec)
+        else:
+            raise RuntimeError(f'failed to find context type: {context_name}')
     return context_list
 
 

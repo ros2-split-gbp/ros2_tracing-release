@@ -2,6 +2,32 @@
 Changelog for package tracetools_trace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2020-04-24)
+------------------
+* Start a session daemon if there isn't one before setting up tracing
+* Contributors: Christophe Bedard
+
+0.3.0 (2020-03-04)
+------------------
+* Add more context types and refactor mapping between name and constant
+* Check version of LTTng Python module and raise error if below 2.10.7
+* Add logs for trace action init and fini
+* Expose context enabling through CLI and Trace action
+* Add kmem_mm_page_alloc|free to default kernel events
+* Remove sched_waking/sched_wakeup from the default kernel events list
+* Contributors: Christophe Bedard
+
+0.2.11 (2019-12-09)
+-------------------
+* Register Python packages in the ament index
+* Contributors: Christophe Bedard
+
+0.2.10 (2019-11-17)
+-------------------
+* Make printing list of enabled events more readable
+* Add new rclcpp_subscription_init tracepoint to default ROS events list
+* Contributors: Christophe Bedard
+
 0.2.8 (2019-10-14)
 ------------------
 * Re-order args for trace command

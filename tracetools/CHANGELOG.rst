@@ -2,6 +2,26 @@
 Changelog for package tracetools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2020-04-24)
+------------------
+* Export -rdynamic using ament_export_link_flags and modern CMake
+* Contributors: Christophe Bedard, Dirk Thomas
+
+0.3.0 (2020-03-04)
+------------------
+* Various improvements to the build setup and CMakeLists.txt
+* Contributors: Christophe Bedard, Stephen Brawner
+
+0.2.10 (2019-11-17)
+-------------------
+* Add new rclcpp_subscription_init tracepoint to support new intra-process comms 
+* Contributors: Christophe Bedard
+
+0.2.9 (2019-10-18)
+------------------
+* Set symbols visibility to public for util functions
+* Contributors: Christophe Bedard, Ingo Lütkebohle
+
 0.2.8 (2019-10-14)
 ------------------
 * Add overload of get_symbols as a fallback

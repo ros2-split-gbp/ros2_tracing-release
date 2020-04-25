@@ -14,17 +14,30 @@
 
 """Interface for tracing with LTTng."""
 
+import sys
+
 from typing import List
+from typing import Optional
 
 try:
     from . import lttng_impl
 
-    _lttng = lttng_impl
+    _lttng = lttng_impl  # type: ignore
+
+    # Check lttng module version
+    from distutils.version import StrictVersion
+    current_version = _lttng.get_version()
+    LTTNG_MIN_VERSION = '2.10.7'
+    if current_version is None or current_version < StrictVersion(LTTNG_MIN_VERSION):
+        print(
+            f'lttng module version >={LTTNG_MIN_VERSION} required, found {str(current_version)}',
+            file=sys.stderr,
+        )
 except ImportError:
-    # Fall back on empty functions
+    # Fall back on stub functions so that this still passes linter checks
     from . import lttng_stub
 
-    _lttng = lttng_stub
+    _lttng = lttng_stub  # type: ignore
 
 from .names import DEFAULT_CONTEXT
 from .names import DEFAULT_EVENTS_KERNEL
@@ -37,8 +50,8 @@ def lttng_init(
     base_path: str = DEFAULT_BASE_PATH,
     ros_events: List[str] = DEFAULT_EVENTS_ROS,
     kernel_events: List[str] = DEFAULT_EVENTS_KERNEL,
-    context_names: List[str] = DEFAULT_CONTEXT
-) -> None:
+    context_names: List[str] = DEFAULT_CONTEXT,
+) -> Optional[str]:
     """
     Set up and start LTTng session.
 
@@ -47,12 +60,22 @@ def lttng_init(
     :param ros_events: list of ROS events to enable
     :param kernel_events: list of kernel events to enable
     :param context_names: list of context elements to enable
+    :return: the full path to the trace directory
     """
-    _lttng.setup(session_name, base_path, ros_events, kernel_events, context_names)
+    trace_directory = _lttng.setup(
+        session_name,
+        base_path,
+        ros_events,
+        kernel_events,
+        context_names,
+    )
     _lttng.start(session_name)
+    return trace_directory
 
 
-def lttng_fini(session_name: str) -> None:
+def lttng_fini(
+    session_name: str,
+) -> None:
     """
     Stop and destroy LTTng session.
 

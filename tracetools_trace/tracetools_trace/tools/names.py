@@ -24,6 +24,8 @@ EVENTS_KERNEL = [
     'irq_softirq_exit',
     'irq_handler_entry',
     'irq_handler_exit',
+    'kmem_mm_page_alloc',
+    'kmem_mm_page_free',
     'lttng_statedump_process_state',
     'lttng_statedump_start',
     'lttng_statedump_end',
@@ -48,11 +50,12 @@ EVENTS_KERNEL = [
     'timer_hrtimer_expire_exit',
 ]
 
+# Kernel events that are currently used by analyses (or will most likely be used in the future)
 DEFAULT_EVENTS_KERNEL = [
-    'power_cpu_frequency',
     'sched_switch',
-    'sched_waking',
-    'sched_wakeup',
+    'kmem_mm_page_alloc',
+    'kmem_mm_page_free',
+    'power_cpu_frequency',
 ]
 
 DEFAULT_EVENTS_ROS = [
@@ -60,6 +63,7 @@ DEFAULT_EVENTS_ROS = [
     'ros2:rcl_node_init',
     'ros2:rcl_publisher_init',
     'ros2:rcl_subscription_init',
+    'ros2:rclcpp_subscription_init',
     'ros2:rclcpp_subscription_callback_added',
     'ros2:rcl_service_init',
     'ros2:rclcpp_service_callback_added',
@@ -71,11 +75,34 @@ DEFAULT_EVENTS_ROS = [
     'ros2:callback_end',
 ]
 
+DEFAULT_EVENTS_UST = DEFAULT_EVENTS_ROS
+
+CONTEXT_TYPE_CONSTANTS_MAP = {
+    'pid': 'EVENT_CONTEXT_PID',
+    'procname': 'EVENT_CONTEXT_PROCNAME',
+    'prio': 'EVENT_CONTEXT_PRIO',
+    'nice': 'EVENT_CONTEXT_NICE',
+    'vpid': 'EVENT_CONTEXT_VPID',
+    'tid': 'EVENT_CONTEXT_TID',
+    'vtid': 'EVENT_CONTEXT_VTID',
+    'ppid': 'EVENT_CONTEXT_PPID',
+    'vppid': 'EVENT_CONTEXT_VPPID',
+    'pthread_id': 'EVENT_CONTEXT_PTHREAD_ID',
+    'hostname': 'EVENT_CONTEXT_HOSTNAME',
+    'ip': 'EVENT_CONTEXT_IP',
+    'interruptible': 'EVENT_CONTEXT_INTERRUPTIBLE',
+    'preemptible': 'EVENT_CONTEXT_PREEMPTIBLE',
+    'need_reschedule': 'EVENT_CONTEXT_NEED_RESCHEDULE',
+    'migratable': 'EVENT_CONTEXT_MIGRATABLE',
+    'perf:thread:instructions': None,
+    'perf:thread:cycles': None,
+    'perf:thread:cpu-cycles': None,
+}
+
+CONTEXT = list(CONTEXT_TYPE_CONSTANTS_MAP.keys())
+
 DEFAULT_CONTEXT = [
     'procname',
-    'perf:thread:instructions',
-    'perf:thread:cycles',
-    'perf:thread:cpu-cycles',
     'vpid',
     'vtid',
 ]
