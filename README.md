@@ -1,3 +1,34 @@
+## ros2_tracing (foxy) - 1.0.0-1
+
+The packages in the `ros2_tracing` repository were released into the `foxy` distro by running `/usr/bin/bloom-release --rosdistro foxy --track foxy ros2_tracing --edit` on `Sat, 25 Apr 2020 01:06:47 -0000`
+
+These packages were released:
+- `tracetools`
+- `tracetools_read`
+- `tracetools_trace`
+
+These packages were explicitly ignored:
+- `tracetools_test`
+- `tracetools_launch`
+- `ros2trace`
+
+Version of package(s) in repository `ros2_tracing`:
+
+- upstream repository: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+- release repository: unknown
+- rosdistro version: `null`
+- old version: `null`
+- new version: `1.0.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.9.3`
+- catkin_pkg version: `0.4.17`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.1`
+- vcstools version: `0.1.42`
+
+
 ## ros2_tracing (dashing) - 0.2.8-1
 
 The packages in the `ros2_tracing` repository were released into the `dashing` distro by running `/usr/bin/bloom-release --rosdistro dashing --track dashing ros2_tracing --edit` on `Sat, 14 Mar 2020 15:52:09 -0000`
