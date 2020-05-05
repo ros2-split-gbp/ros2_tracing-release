@@ -1,0 +1,81 @@
+ros-foxy-tracetools-launch (1.0.0-2focal) focal; urgency=high
+
+  * Document what kind of lib_name LdPreload expects
+  * Add logs for LdPreload action on success or failure
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Fri, 24 Apr 2020 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.3.0-2focal) focal; urgency=high
+
+  * Add logs for trace action init and fini
+  * Expose context enabling through CLI and Trace action
+  * Extract LdPreload action from Trace action to support preloading any lib
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Wed, 04 Mar 2020 05:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.12-2focal) focal; urgency=high
+
+  * Use imperative mood in constructor docstring.
+  * Contributors: Christophe Bedard, Steven! Ragnarök
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 09 Dec 2019 05:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.11-2focal) focal; urgency=high
+
+  * Register Python packages in the ament index
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 09 Dec 2019 05:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.7-2focal) focal; urgency=high
+
+  * Fix missing ament_xmllint dependency
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 09 Sep 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.5-2focal) focal; urgency=high
+
+  * Check if OS is Windows when getting shared lib path
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 15 Aug 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.4-2focal) focal; urgency=high
+
+  * Add LD_PRELOAD support for profiling in Trace action
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Wed, 14 Aug 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.3-2focal) focal; urgency=high
+
+  * Add append_timestamp option for trace action
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Mon, 05 Aug 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.2-2focal) focal; urgency=high
+
+  * Revert "Replace special character to fix encoding issue"
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 01 Aug 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.2.1-2focal) focal; urgency=high
+
+  * Replace special character to fix encoding issue
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Wed, 31 Jul 2019 04:00:00 -0000
+
+ros-foxy-tracetools-launch (0.1.0-2focal) focal; urgency=high
+
+  * Add tracing integration into launch
+  * Contributors: Christophe Bedard, Ingo Lütkebohle
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 11 Jul 2019 04:00:00 -0000
+
+
