@@ -6,6 +6,8 @@ Tracing tools for ROS 2.
 
 ## Building
 
+As of Foxy, these instructions also apply to an installation from the Debian packages; it will not work out-of-the-box. Also, note that tracing using `ros2_tracing` is not supported on non-Linux systems.
+
 If LTTng is not found during build, or if the [`TRACETOOLS_DISABLED` option is enabled](#disabling-tracing), then this package will not do anything.
 
 To enable tracing:
@@ -16,7 +18,7 @@ To enable tracing:
     $ sudo apt-get install lttng-tools lttng-modules-dkms liblttng-ust-dev
     $ sudo apt-get install python3-babeltrace python3-lttng
     ```
-2. Build
+2. Build (at least up to `rcl` & `rclcpp`):
     ```
     $ colcon build
     ```
@@ -72,7 +74,9 @@ Package containing a `ros2cli` extension to enable tracing.
 
 Library to support instrumenting ROS packages, including core packages.
 
-This package claims to be in the **Quality Level 4** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
+This package claims to be in the **Quality Level 3** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
+
+See the [API documentation](https://micro-ros.gitlab.io/ros_tracing/ros2_tracing-api/).
 
 ### tracetools_launch
 
