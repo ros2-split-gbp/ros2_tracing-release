@@ -1,0 +1,49 @@
+variables:
+  DOCKER_DRIVER: overlay2
+  PACKAGES_LIST: ros2trace tracetools tracetools_launch tracetools_read tracetools_test tracetools_trace
+  BASE_IMAGE_ID: registry.gitlab.com/micro-ros/ros_tracing/ci_base
+  DISTRO: foxy
+
+.global_artifacts: &global_artifacts
+  artifacts:
+    paths:
+      - install
+      - build/*/test_results/*/*.xunit.xml
+      - build/*/pytest.xml
+    reports:
+      junit:
+        - build/*/test_results/*/*.xunit.xml
+        - build/*/pytest.xml
+
+before_script:
+  - vcs import < instrumented.repos
+  - . /root/ws/install/local_setup.sh
+
+tracing_enabled:
+  image: $BASE_IMAGE_ID:$DISTRO
+  script:
+    - lttng --version && apt list lttng-tools liblttng-ust-dev python3-lttng python3-babeltrace
+    - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
+    - . install/setup.sh
+    - ./build/tracetools/status
+    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - colcon test-result --all
+  <<: *global_artifacts
+
+tracing_disabled:
+  image: $BASE_IMAGE_ID:$DISTRO
+  script:
+    - colcon build --symlink-install --event-handlers console_cohesion+ --cmake-args " -DTRACETOOLS_DISABLED=ON" --packages-up-to $PACKAGES_LIST
+    - (! ./build/tracetools/status)
+    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - colcon test-result --all
+  <<: *global_artifacts
+
+no_lttng:
+  image: $BASE_IMAGE_ID:$DISTRO-base
+  script:
+    - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST
+    - (! ./build/tracetools/status)
+    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - colcon test-result --all
+  <<: *global_artifacts
