@@ -2,7 +2,7 @@ This document is a declaration of software quality for the `tracetools` package,
 
 # `tracetools` Quality Declaration
 
-The package `tracetools` claims to be in the **Quality Level 4** category.
+The package `tracetools` claims to be in the **Quality Level 3** category.
 
 Below are the rationales, notes, and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 1 in REP-2004](https://www.ros.org/reps/rep-2004.html).
 
@@ -14,7 +14,7 @@ Below are the rationales, notes, and caveats for this claim, organized by each r
 
 ### Version Stability [1.ii]
 
-`tracetools` is not currently at or above a stable version, i.e. `>= 1.0.0`.
+`tracetools` is at or above a stable version, i.e. `>= 1.0.0`.
 
 ### Public API Declaration [1.iii]
 
@@ -40,7 +40,8 @@ All changes occur through a merge request.
 
 ### Contributor Origin [2.ii]
 
-`tracetools` does not currently have any contributor origin policy.
+`tracetools` uses DCO as its confirmation of contributor origin policy. More information can be found in [CONTRIBUTING](../CONTRIBUTING.md).
+There is currently no automated check.
 
 ### Peer Review Policy [2.iii]
 
@@ -72,7 +73,9 @@ It does not currently have a features list with links to the corresponding featu
 
 ### Public API Documentation [3.ii]
 
-`tracetools` does not currently have documentation for its public API.
+`tracetools` has embedded API documentation which can be generated using doxygen. The latest version can be viewed [here](https://micro-ros.gitlab.io/ros_tracing/ros2_tracing-api/).
+
+New additions to the public API require documentation before being added.
 
 ### License [3.iii]
 
@@ -109,7 +112,7 @@ This includes:
 
 Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by reviewers.
 
-Current coverage statistics can be viewed in the [results of the latest `coverage` CI job](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/pipelines/latest).
+Current coverage statistics can be viewed [on codecov.io](https://codecov.io/gl/micro-ROS:ros_tracing/ros2_tracing) or in the [results of the latest `coverage` CI job](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/pipelines/latest).
 
 ### Performance [4.iv]
 
@@ -161,20 +164,20 @@ The table below compares the requirements in REP-2004 with the current state of 
 |--|--|--|
 |1| **Version policy** ||
 |1.i| Version policy | ✓ |
-|1.ii| Stable version |  |
+|1.ii| Stable version | ✓ |
 |1.iii| Strictly declared public API | ✓ |
 |1.iv| API stability policy | ✓ |
 |1.v| ABI stability policy | ✓ |
 |1.vi| API/ABI stablility policy within ROS distribution | ✓ |
 |2| **Change control process** ||
 |2.i| All changes occur through change request | ✓ |
-|2.ii| Confirmation of contributor origin |  |
+|2.ii| Confirmation of contributor origin | ✓ * |
 |2.iii| Peer review policy | ✓ * |
 |2.iv| CI policy for change requests | ✓ |
 |2.v| Documentation policy for change requests | ✓ |
 |3| **Documentation** ||
 |3.i| Per feature documentation | ✓ |
-|3.ii| Public API documentation |  |
+|3.ii| Public API documentation | ✓ |
 |3.iii| Declared license(s) | ✓ |
 |3.iv| Copyright in source files | ✓ |
 |3.v.a| Quality declaration linked to from README | ✓ |
@@ -183,7 +186,7 @@ The table below compares the requirements in REP-2004 with the current state of 
 |4.i| Feature items tests | ✓ |
 |4.ii| Public API tests | ✓ |
 |4.iii.a| Using coverage | ✓ |
-|4.iii.a| Coverage policy |  |
+|4.iii.b| Coverage policy |  |
 |4.iv.a| Performance tests |  |
 |4.iv.b| Performance tests policy |  |
 |4.v.a| Code style enforcement (linters) | ✓ |
@@ -199,7 +202,8 @@ The table below compares the requirements in REP-2004 with the current state of 
 
 \* : going forward
 
-Comparing this table to the [Quality Level Comparison Chart of REP-2004](https://www.ros.org/reps/rep-2004.html#quality-level-comparison-chart) led us to conclude that this package qualifies for Quality Level 4.
+Comparing this table to the [Quality Level Comparison Chart of REP-2004](https://www.ros.org/reps/rep-2004.html#quality-level-comparison-chart) led us to conclude that this package qualifies for Quality Level 3.
 
-Missing for Quality Level 3:
-* 1.ii Stable version
+Missing for Quality Level 2:
+* 5.iii Justifies quality use of non-ROS dependencies
+* 7.i Vulnerability Disclosure Policy
