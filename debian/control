@@ -1,0 +1,12 @@
+Source: ros-foxy-tracetools-test
+Section: misc
+Priority: optional
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), pkg-config, python3-pytest, python3-pytest-cov, ros-foxy-ament-cmake, ros-foxy-ament-cmake-gtest, ros-foxy-ament-cmake-mypy, ros-foxy-ament-cmake-pytest, ros-foxy-ament-lint-auto, ros-foxy-ament-lint-common, ros-foxy-launch-ros, ros-foxy-rclcpp, ros-foxy-std-msgs, ros-foxy-std-srvs, ros-foxy-tracetools, ros-foxy-tracetools-launch, ros-foxy-tracetools-read, ros-foxy-ros-workspace
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-foxy-tracetools-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-foxy-rclcpp, ros-foxy-std-msgs, ros-foxy-std-srvs, ros-foxy-ros-workspace
+Description: Testing utilities and tests for the tracetools package.
