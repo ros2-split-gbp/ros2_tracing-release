@@ -21,7 +21,7 @@ tracks:
     release_tag: :{version}
     ros_distro: dashing
     vcs_type: git
-    vcs_uri: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    vcs_uri: https://gitlab.com/ros-tracing/ros2_tracing.git
     version: 0.2.8
   eloquent:
     actions:
@@ -45,7 +45,7 @@ tracks:
     release_tag: :{version}
     ros_distro: eloquent
     vcs_type: git
-    vcs_uri: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    vcs_uri: https://gitlab.com/ros-tracing/ros2_tracing.git
     version: :{auto}
   foxy:
     actions:
@@ -69,7 +69,7 @@ tracks:
     release_tag: :{version}
     ros_distro: foxy
     vcs_type: git
-    vcs_uri: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    vcs_uri: https://gitlab.com/ros-tracing/ros2_tracing.git
     version: :{auto}
   rolling:
     actions:
@@ -95,5 +95,5 @@ tracks:
     release_tag: :{version}
     ros_distro: rolling
     vcs_type: git
-    vcs_uri: https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing.git
+    vcs_uri: https://gitlab.com/ros-tracing/ros2_tracing.git
     version: :{auto}
