@@ -2,8 +2,10 @@
 Changelog for package tracetools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.0.4 (2020-09-20)
+2.0.0 (2020-10-12)
 ------------------
+* Add lifecycle node state transition instrumentation
+* Do not export tracetools if empty
 * Allow disabling tracetools status app
 * Contributors: Christophe Bedard, Ingo Lütkebohle, José Antonio Moral
 
