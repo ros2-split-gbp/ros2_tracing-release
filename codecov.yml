@@ -1,3 +1,0 @@
-fixes:
-  - "/builds/micro-ROS/ros_tracing/ros2_tracing/::"
-  - "/builds/micro-ROS/ros_tracing/ros2_tracing/install/tracetools/::tracetools/"
