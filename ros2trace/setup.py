@@ -5,7 +5,7 @@ package_name = 'ros2trace'
 
 setup(
     name=package_name,
-    version='1.0.4',
+    version='1.0.5',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
@@ -24,7 +24,7 @@ setup(
     ),
     author='Christophe Bedard',
     author_email='fixed-term.christophe.bourquebedard@de.bosch.com',
-    url='https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing',
+    url='https://gitlab.com/ros-tracing/ros2_tracing',
     keywords=[],
     description='The trace command for ROS 2 command line tools.',
     long_description=(

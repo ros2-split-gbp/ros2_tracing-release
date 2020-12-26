@@ -1,6 +1,7 @@
 # ros2_tracing
 
-[![pipeline status](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/badges/master/pipeline.svg)](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/commits/master)
+[![pipeline status](https://gitlab.com/ros-tracing/ros2_tracing/badges/foxy/pipeline.svg)](https://gitlab.com/ros-tracing/ros2_tracing/commits/foxy)
+[![codecov](https://codecov.io/gl/ros-tracing/ros2_tracing/branch/foxy/graph/badge.svg)](https://codecov.io/gl/ros-tracing/ros2_tracing)
 
 Tracing tools for ROS 2.
 
@@ -74,9 +75,9 @@ Package containing a `ros2cli` extension to enable tracing.
 
 Library to support instrumenting ROS packages, including core packages.
 
-This package claims to be in the **Quality Level 3** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
+This package claims to be in the **Quality Level 1** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
 
-See the [API documentation](https://micro-ros.gitlab.io/ros_tracing/ros2_tracing-api/).
+See the [API documentation](https://ros-tracing.gitlab.io/ros2_tracing-api/).
 
 ### tracetools_launch
 
@@ -96,4 +97,4 @@ Package containing tools to enable tracing.
 
 ## Analysis
 
-See [`tracetools_analysis`](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis).
+See [`tracetools_analysis`](https://gitlab.com/ros-tracing/tracetools_analysis).
