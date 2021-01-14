@@ -70,9 +70,12 @@ DEFAULT_EVENTS_ROS = [
     'ros2:rcl_client_init',
     'ros2:rcl_timer_init',
     'ros2:rclcpp_timer_callback_added',
+    'ros2:rclcpp_timer_link_node',
     'ros2:rclcpp_callback_register',
     'ros2:callback_start',
     'ros2:callback_end',
+    'ros2:rcl_lifecycle_state_machine_init',
+    'ros2:rcl_lifecycle_transition',
 ]
 
 DEFAULT_EVENTS_UST = DEFAULT_EVENTS_ROS

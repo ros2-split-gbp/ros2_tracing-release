@@ -16,12 +16,14 @@ find_package(ament_cmake_ros REQUIRED)
 
 if(WIN32)
   set(DISABLED_DEFAULT ON)
+  set(STATUS_CHECKING_TOOL_DEFAULT OFF)
 else()
   set(DISABLED_DEFAULT OFF)
+  set(STATUS_CHECKING_TOOL_DEFAULT ON)
 endif()
 option(TRACETOOLS_DISABLED "Explicitly disable support for tracing" ${DISABLED_DEFAULT})
 option(TRACETOOLS_NO_RDYNAMIC "Disable export of -rdynamic link flag" OFF)
-option(TRACETOOLS_STATUS_CHECKING_TOOL "Enable the status checking tool" ON)
+option(TRACETOOLS_STATUS_CHECKING_TOOL "Enable the status checking tool" ${STATUS_CHECKING_TOOL_DEFAULT})
 
 if(NOT TRACETOOLS_DISABLED)
   # Set TRACETOOLS_LTTNG_ENABLED if we can find lttng-ust
@@ -60,15 +62,6 @@ if(TRACETOOLS_LTTNG_ENABLED)
   )
 endif()
 
-# Copy select headers to the actual include/ directory that we will use and export
-foreach(_header ${HEADERS})
-  configure_file(
-    ${PROJECT_SOURCE_DIR}/${_header}
-    ${PROJECT_BINARY_DIR}/${_header}
-    COPYONLY
-  )
-endforeach()
-
 add_library(${PROJECT_NAME} ${SOURCES})
 if(TRACETOOLS_LTTNG_ENABLED)
   target_link_libraries(${PROJECT_NAME} ${LTTNG_LIBRARIES})
@@ -93,21 +86,47 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
   "$<INSTALL_INTERFACE:include>"
 )
-ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+if(NOT TRACETOOLS_DISABLED)
+  ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+endif()
 
 if(TRACETOOLS_STATUS_CHECKING_TOOL)
+  # Lib for status checking
+  add_library(${PROJECT_NAME}_status
+    src/status.c
+  )
+  target_link_libraries(${PROJECT_NAME}_status
+    ${PROJECT_NAME}
+  )
+  install(TARGETS
+    ${PROJECT_NAME}_status
+    DESTINATION lib
+  )
+  list(APPEND HEADERS
+    include/${PROJECT_NAME}/status.h
+  )
   # Status checking tool
   add_executable(status
-    src/status.c
+    src/status_tool.c
   )
   target_link_libraries(status
     ${PROJECT_NAME}
+    ${PROJECT_NAME}_status
   )
   install(TARGETS
     status
     DESTINATION lib/${PROJECT_NAME}
   )
 endif()
+
+# Copy select headers to the actual include/ directory that we will use and export
+foreach(_header ${HEADERS})
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/${_header}
+    ${PROJECT_BINARY_DIR}/${_header}
+    COPYONLY
+  )
+endforeach()
 
 install(
   DIRECTORY ${PROJECT_BINARY_DIR}/include/
@@ -129,7 +148,7 @@ if(TRACETOOLS_LTTNG_ENABLED)
   if(NOT TRACETOOLS_NO_RDYNAMIC)
     ament_export_link_flags("-rdynamic")
   endif()
-else()
+elseif(NOT TRACETOOLS_DISABLED)
   ament_export_libraries(${PROJECT_NAME})
 endif()
 
@@ -139,13 +158,18 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   if(TRACETOOLS_STATUS_CHECKING_TOOL)
+    find_package(ament_cmake_gtest REQUIRED)
+    ament_add_gtest(test_status test/test_status.cpp)
+    if(TARGET test_status)
+      target_link_libraries(test_status ${PROJECT_NAME} ${PROJECT_NAME}_status)
+    endif()
+
     # Run status tool executable as test and set pass/fail expectation appropriately
     add_test(test_status_tool status)
     if(NOT TRACETOOLS_LTTNG_ENABLED)
       set_tests_properties(test_status_tool PROPERTIES WILL_FAIL TRUE)
     endif()
   endif()
-
 endif()
 
 ament_package()

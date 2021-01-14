@@ -2,7 +2,7 @@ variables:
   DOCKER_DRIVER: overlay2
   PACKAGES_LIST: ros2trace tracetools tracetools_launch tracetools_read tracetools_test tracetools_trace
   BASE_IMAGE_ID: registry.gitlab.com/ros-tracing/ci_base
-  DISTRO: foxy
+  DISTRO: rolling
 
 stages:
   - build_test
@@ -66,11 +66,19 @@ coverage:
     - colcon lcov-result --initial
     - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST --mixin coverage-pytest
     - colcon test-result --all --verbose
-    - colcon lcov-result --packages-select tracetools tracetools_test --filter **/tracetools_test/test/* --verbose
+    - colcon lcov-result --packages-select tracetools tracetools_test --filter **/tracetools/test/* **/tracetools_test/test/* --verbose
     - colcon coveragepy-result --packages-select $PACKAGES_LIST --verbose --coverage-report-args -m
     - codecov -X gcovout --file lcov/total_coverage.info coveragepy/.coverage
   allow_failure: true
   <<: *global_artifacts
+
+dco:
+  stage: report
+  image: $BASE_IMAGE_ID:$DISTRO-base
+  before_script: []
+  script:
+    - pip3 install -U dco-check
+    - dco-check --verbose
 
 trigger_gen_docs:
   stage: report

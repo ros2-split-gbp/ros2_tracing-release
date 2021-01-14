@@ -1,4 +1,5 @@
 // Copyright 2019 Robert Bosch GmbH
+// Copyright 2020 Christophe Bedard
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -185,6 +186,17 @@ void TRACEPOINT(
 }
 
 void TRACEPOINT(
+  rclcpp_timer_link_node,
+  const void * timer_handle,
+  const void * node_handle)
+{
+  CONDITIONAL_TP(
+    rclcpp_timer_link_node,
+    timer_handle,
+    node_handle);
+}
+
+void TRACEPOINT(
   rclcpp_callback_register,
   const void * callback,
   const char * function_symbol)
@@ -213,6 +225,30 @@ void TRACEPOINT(
   CONDITIONAL_TP(
     callback_end,
     callback);
+}
+
+void TRACEPOINT(
+  rcl_lifecycle_state_machine_init,
+  const void * node_handle,
+  const void * state_machine)
+{
+  CONDITIONAL_TP(
+    rcl_lifecycle_state_machine_init,
+    node_handle,
+    state_machine);
+}
+
+void TRACEPOINT(
+  rcl_lifecycle_transition,
+  const void * state_machine,
+  const char * start_label,
+  const char * goal_label)
+{
+  CONDITIONAL_TP(
+    rcl_lifecycle_transition,
+    state_machine,
+    start_label,
+    goal_label);
 }
 
 #ifndef _WIN32
