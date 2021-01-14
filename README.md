@@ -1,7 +1,7 @@
 # ros2_tracing
 
-[![pipeline status](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/badges/master/pipeline.svg)](https://gitlab.com/micro-ROS/ros_tracing/ros2_tracing/commits/master)
-[![codecov](https://codecov.io/gl/micro-ROS:ros_tracing/ros2_tracing/branch/master/graph/badge.svg)](https://codecov.io/gl/micro-ROS:ros_tracing/ros2_tracing)
+[![pipeline status](https://gitlab.com/ros-tracing/ros2_tracing/badges/master/pipeline.svg)](https://gitlab.com/ros-tracing/ros2_tracing/commits/master)
+[![codecov](https://codecov.io/gl/ros-tracing/ros2_tracing/branch/master/graph/badge.svg)](https://codecov.io/gl/ros-tracing/ros2_tracing)
 
 Tracing tools for ROS 2.
 
@@ -39,7 +39,12 @@ $ colcon build --cmake-args " -DTRACETOOLS_DISABLED=ON"
 
 ## Tracing
 
-The steps above will not lead to trace data being generated, and thus they will have no impact on execution. LTTng has to be configured for tracing. The packages in this repo provide two options.
+The steps above will not lead to trace data being generated, and thus they will have no impact on execution. LTTng has to be configured for tracing. The packages in this repo provide two options: a [command](#Trace-command) and a [launch file action](#Launch-file-trace-action).
+
+The tracing directory can be configured using command/launch action parameters, or through environment variables with the following logic:
+
+* Use `$ROS_TRACE_DIR` if `ROS_TRACE_DIR` is set and not empty.
+* Otherwise, use `$ROS_HOME/tracing`, using `~/.ros` for `ROS_HOME` if not set or if empty.
 
 ### Trace command
 
@@ -59,7 +64,7 @@ Another option is to use the `Trace` action in a launch file along with your `No
 $ ros2 launch tracetools_launch example.launch.py
 ```
 
-See [this example launch file](./tracetools_launch/launch/example.launch.py) for more information.
+See [this example launch file](./tracetools_launch/launch/example.launch.py) and the [`Trace` action](./tracetools_launch/tracetools_launch/action.py) for more information.
 
 ## Design
 
@@ -75,9 +80,9 @@ Package containing a `ros2cli` extension to enable tracing.
 
 Library to support instrumenting ROS packages, including core packages.
 
-This package claims to be in the **Quality Level 2** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
+This package claims to be in the **Quality Level 1** category, see the [Quality Declaration](./tracetools/QUALITY_DECLARATION.md) for more details.
 
-See the [API documentation](https://micro-ros.gitlab.io/ros_tracing/ros2_tracing-api/).
+See the [API documentation](https://ros-tracing.gitlab.io/ros2_tracing-api/).
 
 ### tracetools_launch
 
@@ -97,4 +102,4 @@ Package containing tools to enable tracing.
 
 ## Analysis
 
-See [`tracetools_analysis`](https://gitlab.com/micro-ROS/ros_tracing/tracetools_analysis).
+See [`tracetools_analysis`](https://gitlab.com/ros-tracing/tracetools_analysis).
