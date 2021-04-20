@@ -1,1 +1,1 @@
-{"base": "6dbeb69", "parent": "debian/rolling/ros2trace", "previous": "6e07856", "trim": "", "trimbase": ""}
+{"base": "8842c86", "parent": "debian/galactic/ros2trace", "previous": "ad7fabb", "trim": "", "trimbase": ""}
