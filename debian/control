@@ -1,0 +1,12 @@
+Source: ros-galactic-tracetools-read
+Section: misc
+Priority: optional
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), python3-pytest, ros-galactic-ament-copyright, ros-galactic-ament-flake8, ros-galactic-ament-mypy, ros-galactic-ament-pep257, ros-galactic-ament-xmllint, ros-galactic-ros-workspace, python3-all, python3-setuptools
+Homepage: https://index.ros.org/p/tracetools_read/
+Standards-Version: 3.9.2
+
+Package: ros-galactic-tracetools-read
+Architecture: any
+Depends: ${python3:Depends}, ${misc:Depends}, python3-babeltrace, ros-galactic-ros-workspace
+Description: Tools for reading traces.
