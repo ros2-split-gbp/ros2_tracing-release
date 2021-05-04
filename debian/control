@@ -1,0 +1,12 @@
+Source: ros-galactic-tracetools-test
+Section: misc
+Priority: optional
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), pkg-config, python3-pytest, python3-pytest-cov, ros-galactic-ament-cmake, ros-galactic-ament-cmake-gtest, ros-galactic-ament-cmake-mypy, ros-galactic-ament-cmake-pytest, ros-galactic-ament-lint-auto, ros-galactic-ament-lint-common, ros-galactic-launch-ros, ros-galactic-lifecycle-msgs, ros-galactic-rclcpp, ros-galactic-rclcpp-lifecycle, ros-galactic-std-msgs, ros-galactic-std-srvs, ros-galactic-tracetools, ros-galactic-tracetools-launch, ros-galactic-tracetools-read, ros-galactic-ros-workspace
+Homepage: https://index.ros.org/p/tracetools_test/
+Standards-Version: 3.9.2
+
+Package: ros-galactic-tracetools-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-galactic-lifecycle-msgs, ros-galactic-rclcpp, ros-galactic-rclcpp-lifecycle, ros-galactic-std-msgs, ros-galactic-std-srvs, ros-galactic-ros-workspace
+Description: Testing utilities and tests for the tracetools package.
