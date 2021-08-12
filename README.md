@@ -1,3 +1,32 @@
+## ros2_tracing (rolling) - 3.1.0-1
+
+The packages in the `ros2_tracing` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ros2_tracing` on `Thu, 12 Aug 2021 00:37:36 -0000`
+
+These packages were released:
+- `ros2trace`
+- `tracetools`
+- `tracetools_launch`
+- `tracetools_read`
+- `tracetools_test`
+- `tracetools_trace`
+
+Version of package(s) in repository `ros2_tracing`:
+
+- upstream repository: https://gitlab.com/ros-tracing/ros2_tracing.git
+- release repository: https://github.com/ros2-gbp/ros2_tracing-release.git
+- rosdistro version: `3.0.0-1`
+- old version: `3.0.0-1`
+- new version: `3.1.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.23`
+- rosdep version: `0.21.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## ros2_tracing (rolling) - 3.0.0-1
 
 The packages in the `ros2_tracing` repository were released into the `rolling` distro by running `/usr/bin/bloom-release --rosdistro rolling --track rolling ros2_tracing` on `Mon, 26 Jul 2021 22:35:53 -0000`
