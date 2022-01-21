@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,20 +19,22 @@ from distutils.version import StrictVersion
 import os
 import re
 import subprocess
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Set
+from typing import Tuple
 from typing import Union
+import warnings
 
 import lttng
 
 from .names import CONTEXT_TYPE_CONSTANTS_MAP
 from .names import DEFAULT_CONTEXT
-from .names import DEFAULT_EVENTS_KERNEL
 from .names import DEFAULT_EVENTS_ROS
 
 
-def get_version() -> Union[StrictVersion, None]:
+def get_version() -> Optional[StrictVersion]:
     """
     Get the version of the lttng module.
 
@@ -51,12 +54,25 @@ def get_version() -> Union[StrictVersion, None]:
     return StrictVersion(version_string)
 
 
+def is_kernel_tracer_available() -> Tuple[bool, Optional[str]]:
+    process = subprocess.run(
+        ['lttng', 'list', '-k'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if 0 != process.returncode:
+        return False, process.stderr.decode().strip('\n')
+    return True, None
+
+
 def setup(
+    *,
     session_name: str,
     base_path: str,
     ros_events: Union[List[str], Set[str]] = DEFAULT_EVENTS_ROS,
-    kernel_events: Union[List[str], Set[str]] = DEFAULT_EVENTS_KERNEL,
-    context_names: Union[List[str], Set[str]] = DEFAULT_CONTEXT,
+    kernel_events: Union[List[str], Set[str]] = [],
+    context_fields: Union[List[str], Set[str], Dict[str, List[str]]] = DEFAULT_CONTEXT,
+    context_names: Optional[Union[List[str], Set[str], Dict[str, List[str]]]] = None,
     channel_name_ust: str = 'ros2',
     channel_name_kernel: str = 'kchan',
 ) -> Optional[str]:
@@ -65,29 +81,59 @@ def setup(
 
     See: https://lttng.org/docs/#doc-core-concepts
 
+    Initialization will fail if the list of kernel events to be
+    enabled is not empty and if the kernel tracer is not installed.
+
     :param session_name: the name of the session
     :param base_path: the path to the directory in which to create the tracing session directory
     :param ros_events: list of ROS events to enable
     :param kernel_events: list of kernel events to enable
-    :param context_names: list of context elements to enable
+    :param context_fields: the names of context fields to enable
+        if it's a list or a set, the context fields are enabled for both kernel and userspace;
+        if it's a dictionary: { domain type string -> context fields list }
+    :param context_names: DEPRECATED, use context_fields instead
     :param channel_name_ust: the UST channel name
     :param channel_name_kernel: the kernel channel name
-    :return: the full path to the trace directory
+    :return: the full path to the trace directory, or `None` if initialization failed
     """
+    # Use value from deprecated param if it is provided
+    # TODO(christophebedard) remove context_names param in Rolling after Humble release
+    if context_names is not None:
+        context_fields = context_names
+        warnings.warn('context_names parameter is deprecated, use context_fields', stacklevel=4)
+
     # Check if there is a session daemon running
     if lttng.session_daemon_alive() == 0:
-        # Otherwise spawn one without doing any error checks
+        # Otherwise spawn one and check if it worked
         subprocess.run(
             ['lttng-sessiond', '--daemonize'],
         )
+        if lttng.session_daemon_alive() == 0:
+            print('error: failed to start lttng session daemon')
+            return None
+
+    # Make sure the kernel tracer is available if there are kernel events
+    # Do this after spawning a session daemon, otherwise we can't detect the kernel tracer
+    if 0 < len(kernel_events):
+        kernel_tracer_available, message = is_kernel_tracer_available()
+        if not kernel_tracer_available:
+            print(
+                f'error: kernel tracer is not available: {message}\n'
+                '  cannot use kernel events:\n'
+                "    'ros2 trace' command: cannot use '-k' option\n"
+                "    'Trace' action: cannot set 'events_kernel'/'events-kernel' list\n"
+                '  install the kernel tracer, e.g., on Ubuntu, install lttng-modules-dkms\n'
+                '  see: https://gitlab.com/ros-tracing/ros2_tracing#building'
+            )
+            return None
 
     # Convert lists to sets
     if not isinstance(ros_events, set):
         ros_events = set(ros_events)
     if not isinstance(kernel_events, set):
         kernel_events = set(kernel_events)
-    if not isinstance(context_names, set):
-        context_names = set(context_names)
+    if isinstance(context_fields, list):
+        context_fields = set(context_fields)
 
     # Resolve full tracing directory path
     full_path = os.path.join(base_path, session_name)
@@ -105,13 +151,15 @@ def setup(
         channel_ust.name = channel_name_ust
         # Discard, do not overwrite
         channel_ust.attr.overwrite = 0
-        # 8 sub-buffers of 2 times the usual page size
-        channel_ust.attr.subbuf_size = 2 * 4096
-        channel_ust.attr.num_subbuf = 8
+        # 2 sub-buffers of 8 times the usual page size
+        # We use 2 sub-buffers because the number of sub-buffers is pointless in discard mode,
+        # and switching between sub-buffers introduces noticeable CPU overhead
+        channel_ust.attr.subbuf_size = 8 * 4096
+        channel_ust.attr.num_subbuf = 2
         # Ignore switch timer interval and use read timer instead
         channel_ust.attr.switch_timer_interval = 0
         channel_ust.attr.read_timer_interval = 200
-        # mmap channel output instead of splice
+        # mmap channel output (only option for UST)
         channel_ust.attr.output = lttng.EVENT_MMAP
         events_list_ust = _create_events(ros_events)
     if kernel_enabled:
@@ -123,10 +171,10 @@ def setup(
         channel_kernel.name = channel_name_kernel
         # Discard, do not overwrite
         channel_kernel.attr.overwrite = 0
-        # 8 sub-buffers of 8 times the usual page size, since
+        # 2 sub-buffers of 32 times the usual page size, since
         # there can be way more kernel events than UST events
-        channel_kernel.attr.subbuf_size = 8 * 4096
-        channel_kernel.attr.num_subbuf = 8
+        channel_kernel.attr.subbuf_size = 32 * 4096
+        channel_kernel.attr.num_subbuf = 2
         # Ignore switch timer interval and use read timer instead
         channel_kernel.attr.switch_timer_interval = 0
         channel_kernel.attr.read_timer_interval = 200
@@ -150,18 +198,17 @@ def setup(
         _enable_events(handle_kernel, events_list_kernel, channel_kernel.name)
 
     # Context
-    context_list = _create_context_list(context_names)
-    # TODO make it possible to add context in userspace and kernel separately, since some context
-    # types might only apply to userspace OR kernel; only consider userspace contexts for now
-    handles_context = [handle_ust]
-    enabled_handles: List[lttng.Handle] = list(filter(None, handles_context))
-    _add_context(enabled_handles, context_list)
+    contexts_dict = _normalize_contexts_dict(
+        {'kernel': handle_kernel, 'userspace': handle_ust}, context_fields)
+    _add_context(contexts_dict)
 
     return full_path
 
 
 def start(
+    *,
     session_name: str,
+    **kwargs,
 ) -> None:
     """
     Start LTTng session, and check for errors.
@@ -174,7 +221,9 @@ def start(
 
 
 def stop(
+    *,
     session_name: str,
+    **kwargs,
 ) -> None:
     """
     Stop LTTng session, and check for errors.
@@ -187,7 +236,9 @@ def stop(
 
 
 def destroy(
+    *,
     session_name: str,
+    **kwargs,
 ) -> None:
     """
     Destroy LTTng session, and check for errors.
@@ -229,11 +280,11 @@ def _create_session(
     :param full_path: the full path to the main directory to write trace data to
     """
     result = lttng.create(session_name, full_path)
-    LTTNG_ERR_EXIST_SESS = 28
-    if result == -LTTNG_ERR_EXIST_SESS:
+    # See lttng-tools/include/lttng/lttng-error.h
+    if -28 == result:
         # Sessions seem to persist, so if it already exists,
         # just destroy it and try again
-        destroy(session_name)
+        destroy(session_name=session_name)
         result = lttng.create(session_name, full_path)
     if result < 0:
         raise RuntimeError(f'session creation failed: {lttng.strerror(result)}')
@@ -296,51 +347,74 @@ context_map = {
 }
 
 
-def _context_name_to_type(
-    context_name: str,
-) -> Union[int, None]:
+def _context_field_name_to_type(
+    context_field_name: str,
+) -> Optional[int]:
     """
     Convert from context name to LTTng enum/constant type.
 
-    :param context_name: the generic name for the context
+    :param context_field_name: the generic name for the context field
     :return: the associated type, or `None` if it cannot be found
     """
-    return context_map.get(context_name, None)
+    return context_map.get(context_field_name, None)
 
 
 def _create_context_list(
-    context_names: Set[str],
+    context_fields: Set[str],
 ) -> List[lttng.EventContext]:
     """
-    Create context list from names, and check for errors.
+    Create context list from field names, and check for errors.
 
-    :param context_names: the set of context names
+    :param context_fields: the set of context fields
     :return: the event context list
     """
     context_list = []
-    for context_name in context_names:
+    for context_field_name in context_fields:
         ec = lttng.EventContext()
-        context_type = _context_name_to_type(context_name)
+        context_type = _context_field_name_to_type(context_field_name)
         if context_type is not None:
             ec.ctx = context_type
             context_list.append(ec)
         else:
-            raise RuntimeError(f'failed to find context type: {context_name}')
+            raise RuntimeError(f'failed to find context type: {context_field_name}')
     return context_list
 
 
+def _normalize_contexts_dict(
+    handles: Dict[str, Optional[lttng.Handle]],
+    context_fields: Union[Set[str], Dict[str, List[str]]],
+) -> Dict[lttng.Handle, List[lttng.EventContext]]:
+    """
+    Normalize context list/set/dict to dict.
+
+    :param handles: the mapping from domain type name to handle
+    :param context_fields: the set of context field names,
+        or mapping from domain type name to list of context field names
+    :return: a dictionary of handle to list of event contexts
+    """
+    handles = {domain: handle for domain, handle in handles.items() if handle is not None}
+    contexts_dict = {}
+    if isinstance(context_fields, set):
+        contexts_dict = {h: _create_context_list(context_fields) for _, h in handles.items()}
+    elif isinstance(context_fields, dict):
+        contexts_dict = \
+            {h: _create_context_list(set(context_fields[d])) for d, h in handles.items()}
+    else:
+        assert False
+    return contexts_dict
+
+
 def _add_context(
-    handles: List[lttng.Handle],
-    context_list: List[lttng.EventContext],
+    contexts: Dict[lttng.Handle, List[lttng.EventContext]],
 ) -> None:
     """
-    Add context list to given handles, and check for errors.
+    Add context lists to given handles, and check for errors.
 
-    :param handles: the list of handles for which to add context
-    :param context_list: the list of event contexts to add to the handles
+    :param contexts: the dictionay of context handles -> event contexts
     """
-    for handle in handles:
-        for contex in context_list:
-            result = lttng.add_context(handle, contex, None, None)
+    for handle, contexts_list in contexts.items():
+        for context in contexts_list:
+            result = lttng.add_context(handle, context, None, None)
             if result < 0:
-                raise RuntimeError(f'failed to add context: {lttng.strerror(result)}')
+                raise RuntimeError(
+                    f'failed to add context field {str(context)}: {lttng.strerror(result)}')
