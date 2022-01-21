@@ -1,6 +1,6 @@
 variables:
   DOCKER_DRIVER: overlay2
-  PACKAGES_LIST: ros2trace tracetools tracetools_launch tracetools_read tracetools_test tracetools_trace
+  PACKAGES_LIST: ros2trace tracetools tracetools_launch tracetools_read tracetools_test tracetools_trace test_tracetools
   BASE_IMAGE_ID: registry.gitlab.com/ros-tracing/ci_base
   DISTRO: rolling
 
@@ -47,9 +47,8 @@ tracing_enabled:test:
     - tracing_enabled:build
   script:
     - (source install/setup.sh && ./build/tracetools/status)
-    # - . /root/ws/install/local_setup.sh
-    - source install/setup.sh
-    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - . /root/ws/install/local_setup.sh
+    - colcon test --event-handlers console_direct+ --executor sequential --retest-until-pass 2 --packages-select $PACKAGES_LIST
     - colcon test-result --all --verbose
   <<: *test_artifacts
 
@@ -71,9 +70,8 @@ tracing_disabled:test:
     - tracing_disabled:build
   script:
     - (source install/setup.sh && (! ./build/tracetools/status))
-    # - . /root/ws/install/local_setup.sh
-    - source install/setup.sh
-    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - . /root/ws/install/local_setup.sh
+    - colcon test --event-handlers console_direct+ --executor sequential --retest-until-pass 2 --packages-select $PACKAGES_LIST
     - colcon test-result --all --verbose
   <<: *test_artifacts
 
@@ -96,9 +94,8 @@ no_lttng:test:
   script:
     - (source install/setup.sh && (! ./build/tracetools/status))
     - (source install/setup.sh && (! ros2 trace))
-    # - . /root/ws/install/local_setup.sh
-    - source install/setup.sh
-    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST
+    - . /root/ws/install/local_setup.sh
+    - colcon test --event-handlers console_direct+ --executor sequential --retest-until-pass 2 --packages-select $PACKAGES_LIST
     - colcon test-result --all --verbose
   <<: *test_artifacts
 
@@ -112,12 +109,12 @@ coverage:
   script:
     - colcon build --symlink-install --event-handlers console_cohesion+ --packages-up-to $PACKAGES_LIST --mixin coverage-gcc coverage-pytest --cmake-args -DBUILD_TESTING=ON --no-warn-unused-cli
     - colcon lcov-result --initial
-    - colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES_LIST --mixin coverage-pytest
+    - colcon test --event-handlers console_direct+ --executor sequential --retest-until-pass 2 --packages-select $PACKAGES_LIST --mixin coverage-pytest
     - colcon test-result --all --verbose
-    - colcon lcov-result --packages-select tracetools tracetools_test --filter **/tracetools/test/* **/tracetools_test/test/* --verbose
-    - colcon coveragepy-result --packages-select $PACKAGES_LIST --verbose --coverage-report-args -m
+    - colcon lcov-result --packages-select tracetools --filter **/tracetools/test/* --verbose
+    - colcon coveragepy-result --packages-select ros2trace tracetools_launch tracetools_read tracetools_test tracetools_trace --verbose --coverage-report-args -m
     - pip3 install -U codecov
-    - codecov -X gcovout --file lcov/total_coverage.info coveragepy/.coverage
+    - codecov --no-gcov-out --file lcov/total_coverage.info coveragepy/.coverage
   allow_failure: true
 
 # DCO-checking job (see CONTRIBUTING.md)
