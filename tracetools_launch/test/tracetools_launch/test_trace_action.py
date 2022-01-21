@@ -1,4 +1,5 @@
 # Copyright 2019 Robert Bosch GmbH
+# Copyright 2021 Christophe Bedard
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +17,6 @@ from typing import List
 import unittest
 
 from tracetools_launch.action import Trace
-from tracetools_launch.actions.ld_preload import LdPreload
 
 
 class TestTraceAction(unittest.TestCase):
@@ -29,8 +29,16 @@ class TestTraceAction(unittest.TestCase):
     def test_has_profiling_events(self) -> None:
         events_lists_match: List[List[str]] = [
             [
-                'lttng_ust_cyg_profile_fast:func_entry',
-                'hashtag:yopo',
+                '*',
+                'ros2:*',
+            ],
+            [
+                'lttng_ust_cyg_profile*:*',
+            ],
+        ]
+        events_lists_match_normal: List[List[str]] = [
+            [
+                'lttng_ust_cyg_profile:*',
             ],
             [
                 'lttng_ust_cyg_profile:func_entry',
@@ -38,46 +46,135 @@ class TestTraceAction(unittest.TestCase):
                 'lttng_ust_cyg_profile:func_exit',
             ],
         ]
+        events_lists_match_fast: List[List[str]] = [
+            [
+                'lttng_ust_cyg_profile_fast:*',
+            ],
+            [
+                'lttng_ust_cyg_profile_fast:func_entry',
+                'hashtag:yopo',
+            ],
+        ]
         events_lists_no_match: List[List[str]] = [
+            [
+                'ros2:*',
+            ],
             [
                 'lttng_ust_statedump:bin_info',
                 'ros2:event',
             ],
+            [
+                'lttng_ust_cyg_profile:fake_event',
+                'lttng_ust_cyg_profile_fast:fake_event',
+            ],
             [],
         ]
-        for events in events_lists_match:
-            self.assertTrue(Trace.has_profiling_events(events))
+        for events in events_lists_match + events_lists_match_normal:
+            self.assertTrue(Trace.has_profiling_events(events, False), events)
+        for events in events_lists_match + events_lists_match_fast:
+            self.assertTrue(Trace.has_profiling_events(events, True), events)
         for events in events_lists_no_match:
-            self.assertFalse(Trace.has_profiling_events(events))
+            self.assertFalse(Trace.has_profiling_events(events, False), events)
+            self.assertFalse(Trace.has_profiling_events(events, True), events)
 
-    def test_has_ust_memory_events(self) -> None:
+    def test_has_libc_wrapper_events(self) -> None:
         events_lists_match: List[List[str]] = [
+            [
+                '*',
+                'ros2:*',
+            ],
+            [
+                'lttng_ust_libc:*',
+            ],
             [
                 'hashtag:yopo',
                 'lttng_ust_libc:malloc',
                 'lttng_ust_libc:realloc',
             ],
-            [
-                'lttng_ust_libc:still_a_match',
-            ],
         ]
         events_lists_no_match: List[List[str]] = [
-            [],
+            [
+                'ros2:*',
+            ],
             [
                 'my_random:event',
                 'lttng_ust_whatever'
-            ]
+            ],
+            [
+                'lttng_ust_libc:not_a_match',
+            ],
+            [],
         ]
         for events in events_lists_match:
-            self.assertTrue(Trace.has_ust_memory_events(events))
+            self.assertTrue(Trace.has_libc_wrapper_events(events), events)
         for events in events_lists_no_match:
-            self.assertFalse(Trace.has_ust_memory_events(events))
+            self.assertFalse(Trace.has_libc_wrapper_events(events), events)
 
-    def test_get_shared_lib_path(self) -> None:
-        # Only test not finding a lib for now
-        self.assertIsNone(
-            LdPreload.get_shared_lib_path('random_lib_that_does_not_exist_I_hope.so')
-        )
+    def test_has_pthread_wrapper_events(self) -> None:
+        events_lists_match: List[List[str]] = [
+            [
+                '*',
+                'ros2:*',
+            ],
+            [
+                'lttng_ust_pthread:*',
+            ],
+            [
+                'hashtag:yopo',
+                'lttng_ust_pthread:pthread_mutex_trylock',
+                'lttng_ust_pthread:pthread_mutex_unlock',
+            ],
+        ]
+        events_lists_no_match: List[List[str]] = [
+            [
+                'ros2:*',
+            ],
+            [
+                'my_random:event',
+                'lttng_ust_whatever'
+            ],
+            [
+                'lttng_ust_pthread:not_a_match',
+            ],
+            [],
+        ]
+        for events in events_lists_match:
+            self.assertTrue(Trace.has_pthread_wrapper_events(events), events)
+        for events in events_lists_no_match:
+            self.assertFalse(Trace.has_pthread_wrapper_events(events), events)
+
+    def test_has_dl_events(self) -> None:
+        events_lists_match: List[List[str]] = [
+            [
+                '*',
+                'ros2:*',
+            ],
+            [
+                'lttng_ust_dl:*',
+            ],
+            [
+                'hashtag:yopo',
+                'lttng_ust_dl:dlopen',
+                'lttng_ust_dl:dlmopen',
+            ],
+        ]
+        events_lists_no_match: List[List[str]] = [
+            [
+                'ros2:*',
+            ],
+            [
+                'my_random:event',
+                'lttng_ust_whatever'
+            ],
+            [
+                'lttng_ust_dl:not_a_match',
+            ],
+            [],
+        ]
+        for events in events_lists_match:
+            self.assertTrue(Trace.has_dl_events(events), events)
+        for events in events_lists_no_match:
+            self.assertFalse(Trace.has_dl_events(events), events)
 
 
 if __name__ == '__main__':
