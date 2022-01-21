@@ -7,11 +7,11 @@ package_name = 'tracetools_launch'
 
 setup(
     name=package_name,
-    version='3.1.0',
+    version='4.0.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', glob.glob('launch/*.launch.py')),
+        ('share/' + package_name + '/launch', glob.glob('launch/*.launch.*')),
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
     ],
@@ -35,4 +35,9 @@ setup(
     ),
     license='Apache 2.0',
     tests_require=['pytest'],
+    entry_points={
+        'launch.frontend.launch_extension': [
+            'tracetools_launch = tracetools_launch',
+        ],
+    },
 )
