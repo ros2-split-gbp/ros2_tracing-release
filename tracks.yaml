@@ -122,4 +122,5 @@ tracks:
     ros_distro: rolling
     vcs_type: git
     vcs_uri: https://gitlab.com/ros-tracing/ros2_tracing.git
-    version: :{auto}
+    version: 4.0.0
+    version_saved: :{auto}
