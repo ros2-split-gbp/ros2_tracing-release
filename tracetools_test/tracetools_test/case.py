@@ -24,6 +24,7 @@ from typing import Type
 from typing import Union
 import unittest
 
+from launch import Action
 from tracetools_read import DictEvent
 from tracetools_read import get_event_name
 from tracetools_read import get_event_timestamp
@@ -50,6 +51,8 @@ class TraceTestCase(unittest.TestCase):
     The assert*() functions are specifically in mixedCase to match the unittest functions.
     """
 
+    ENV_VAR_DEBUG = 'TRACETOOLS_TEST_DEBUG'
+
     def __init__(
         self,
         *args,
@@ -59,6 +62,7 @@ class TraceTestCase(unittest.TestCase):
         nodes: List[str],
         base_path: str = '/tmp',
         events_kernel: List[str] = [],
+        additional_actions: Union[List[Action], Action] = [],
     ) -> None:
         """Create a TraceTestCase."""
         super().__init__(methodName=args[0])
@@ -68,6 +72,7 @@ class TraceTestCase(unittest.TestCase):
         self._events_kernel = events_kernel
         self._package = package
         self._nodes = nodes
+        self._additional_actions = additional_actions
 
     def setUp(self):
         # Get timestamp before trace (ns)
@@ -80,6 +85,7 @@ class TraceTestCase(unittest.TestCase):
             self._events_kernel,
             self._package,
             self._nodes,
+            self._additional_actions,
         )
 
         print(f'TRACE DIRECTORY: {full_path}')
@@ -107,7 +113,7 @@ class TraceTestCase(unittest.TestCase):
         self.assertProcessNamesExist(self._nodes)
 
     def tearDown(self):
-        if not os.environ.get('TRACETOOLS_TEST_DEBUG', None):
+        if not os.environ.get(self.ENV_VAR_DEBUG, None):
             cleanup_trace(self._full_path)
 
     def assertEventsSet(  # noqa: N802
