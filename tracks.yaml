@@ -85,7 +85,7 @@ tracks:
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name rhel --skip-keys python3-babeltrace python3-lttng
+      :{release_inc} --os-name rhel --skip-keys python3-babeltrace
     devel_branch: galactic
     last_version: 2.3.0
     name: ros2_tracing
@@ -111,7 +111,7 @@ tracks:
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
       :{release_inc} --os-name fedora
     - git-bloom-generate -y rosrpm --prefix release/:{ros_distro} :{ros_distro} -i
-      :{release_inc} --os-name rhel --skip-keys python3-babeltrace python3-lttng
+      :{release_inc} --os-name rhel --skip-keys python3-babeltrace
     devel_branch: master
     last_version: 4.1.0
     name: ros2_tracing
