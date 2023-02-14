@@ -1,7 +1,7 @@
 # ros2_tracing
 
-[![pipeline status](https://gitlab.com/ros-tracing/ros2_tracing/badges/master/pipeline.svg)](https://gitlab.com/ros-tracing/ros2_tracing/commits/master)
-[![codecov](https://codecov.io/gl/ros-tracing/ros2_tracing/branch/master/graph/badge.svg)](https://codecov.io/gl/ros-tracing/ros2_tracing)
+[![GitHub CI](https://github.com/ros2/ros2_tracing/actions/workflows/test.yml/badge.svg?branch=rolling)](https://github.com/ros2/ros2_tracing/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/ros2/ros2_tracing/branch/rolling/graph/badge.svg)](https://codecov.io/gh/ros2/ros2_tracing)
 
 Tracing tools for ROS 2.
 
@@ -13,32 +13,38 @@ It also provides [tools to configure tracing](#tracing) through [a launch action
 `ros2_tracing` currently only supports the [LTTng](https://lttng.org/) tracer.
 Consequently, it currently only supports Linux.
 
+**Note**: make sure to use the right branch, depending on the ROS 2 distro: [use `rolling` for Rolling, `galactic` for Galactic, etc.](https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Developer-Guide.html#branches)
+
 ## Publications & presentations
 
 [Read the `ros2_tracing` paper!](https://arxiv.org/abs/2201.00393)
-
 If you use or refer to `ros2_tracing`, please cite:
-<!-- TODO replace with early access/published version when available -->
-* C. Bédard, I. Lütkebohle, and M. Dagenais, "ros2_tracing: Multipurpose Low-Overhead Framework for Real-Time Tracing of ROS 2," *arXiv preprint arXiv:2201.00393*, 2022.
+* C. Bédard, I. Lütkebohle, and M. Dagenais, "ros2_tracing: Multipurpose Low-Overhead Framework for Real-Time Tracing of ROS 2," *IEEE Robotics and Automation Letters*, vol. 7, no. 3, pp. 6511–6518, 2022.
 
-BibTeX:
+<details>
+<summary>BibTeX</summary>
 
 ```bibtex
 @article{bedard2022ros2tracing,
   title={ros2\_tracing: Multipurpose Low-Overhead Framework for Real-Time Tracing of ROS 2},
   author={B{\'e}dard, Christophe and L{\"u}tkebohle, Ingo and Dagenais, Michel},
-  journal={arXiv preprint arXiv:2201.00393},
-  year={2022}
+  journal={IEEE Robotics and Automation Letters},
+  year={2022},
+  volume={7},
+  number={3},
+  pages={6511--6518},
+  doi={10.1109/LRA.2022.3174346}
 }
 ```
+</details>
 
-Also, check out the ROS World 2021 presentation titled "Tracing ROS 2 with ros2_tracing" ([video](https://vimeo.com/652633418), [slides](https://gitlab.com/ros-tracing/ros2_tracing/-/raw/master/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)).
+Also, check out the ROS World 2021 presentation titled "Tracing ROS 2 with ros2_tracing" ([video](https://vimeo.com/652633418), [slides](https://github.com/ros2/ros2_tracing/blob/rolling/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)).
 Reference:
-* C. Bédard, "Tracing ROS 2 with ros2_tracing," in *ROS World 2021*. Open Robotics, October 2021. [Online]. Available: https://vimeo.com/652633418, [(pdf)](https://gitlab.com/ros-tracing/ros2_tracing/-/raw/master/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)
+* C. Bédard, "Tracing ROS 2 with ros2_tracing," in *ROS World 2021*. Open Robotics, October 2021. [Online]. Available: https://vimeo.com/652633418, [(pdf)](https://github.com/ros2/ros2_tracing/blob/rolling/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)
 
 ## Tutorials & demos
 
-* Real-Time Working Group documentation tutorial: [How to use `ros2_tracing` to trace and analyze an application](https://real-time-working-group.readthedocs.io/en/latest/Guides/ros2_tracing_trace_and_analyze.html)
+* Real-Time Working Group documentation tutorial: [How to use `ros2_tracing` to trace and analyze an application](https://ros-realtime.github.io/Guides/ros2_tracing_trace_and_analyze.html)
 * ROS World 2021 demo: [github.com/christophebedard/ros-world-2021-demo](https://github.com/christophebedard/ros-world-2021-demo)
 
 ## Building
@@ -49,7 +55,7 @@ If LTTng is not found during build, or if the [`TRACETOOLS_DISABLED` option is e
 
 To enable tracing:
 
-1. Install [LTTng](https://lttng.org/docs/v2.11/) (`>=2.11.1`) with the Python bindings to control tracing and read traces:
+1. Install [LTTng](https://lttng.org/docs/v2.13/) (`>=2.11.1`) with the Python bindings to control tracing and read traces:
     ```
     $ sudo apt-get update
     $ sudo apt-get install lttng-tools liblttng-ust-dev
@@ -60,7 +66,7 @@ To enable tracing:
         ```
         $ sudo apt-get install lttng-modules-dkms
         ```
-    * For more information about LTTng, [see its documentation](https://lttng.org/docs/v2.11/).
+    * For more information about LTTng, [see its documentation](https://lttng.org/docs/v2.13/).
 2. Build:
     *  If you've already built ROS 2 from source before installing LTTng, you will need to re-build at least up to `tracetools`:
         ```
@@ -69,7 +75,7 @@ To enable tracing:
     * If you rely on the ROS 2 binaries (Debian packages, release binaries, or prerelease binaries), you will need to clone this repo into your workspace and build at least up to `tracetools`:
         ```
         $ cd src/
-        $ git clone https://gitlab.com/ros-tracing/ros2_tracing.git
+        $ git clone https://github.com/ros2/ros2_tracing.git
         $ cd ../
         $ colcon build --packages-up-to tracetools
         ```
@@ -96,12 +102,18 @@ The steps above will not lead to trace data being generated, and thus they will 
 LTTng has to be configured for tracing.
 The packages in this repo provide two options: a [command](#trace-command) and a [launch file action](#launch-file-trace-action).
 
+**Note**: tracing must be started before the application is launched.
+Metadata is recorded during the initialization phase of the application.
+This metadata is needed to understand the rest of the trace data, so if tracing is started after the application started executing, then the trace data might be unusable.
+For more information, refer to the [design document](./doc/design_ros_2.md#general-guidelines).
+The [launch file action](#launch-file-trace-action) is designed to automatically start tracing before the application launches.
+
 The tracing directory can be configured using command/launch action parameters, or through environment variables with the following logic:
 
 * Use `$ROS_TRACE_DIR` if `ROS_TRACE_DIR` is set and not empty.
 * Otherwise, use `$ROS_HOME/tracing`, using `~/.ros` for `ROS_HOME` if not set or if empty.
 
-Additionally, **if you're using kernel tracing with a non-root user, make sure that the [`tracing` group exists and that your user is added to it](https://lttng.org/docs/v2.11/#doc-tracing-group)**.
+Additionally, **if you're using kernel tracing with a non-root user, make sure that the [`tracing` group exists and that your user is added to it](https://lttng.org/docs/v2.13/#doc-tracing-group)**.
 
 ```
 # Create group if it doesn't exist
@@ -134,7 +146,7 @@ This way, tracing automatically starts when launching the launch file and ends w
 $ ros2 launch tracetools_launch example.launch.py
 ```
 
-The `Trace` action will also set the `LD_PRELOAD` environment to preload [LTTng's userspace tracing helper(s)](https://lttng.org/docs/#doc-prebuilt-ust-helpers) if the corresponding event(s) are enabled.
+The `Trace` action will also set the `LD_PRELOAD` environment to preload [LTTng's userspace tracing helper(s)](https://lttng.org/docs/v2.13/#doc-prebuilt-ust-helpers) if the corresponding event(s) are enabled.
 For more information, see [this example launch file](./tracetools_launch/launch/example.launch.py) and the [`Trace` action](./tracetools_launch/tracetools_launch/action.py).
 
 You must [install the kernel tracer](#building) if you want to enable kernel events (`events_kernel` in Python, `events-kernel` in XML or YAML).
@@ -156,9 +168,9 @@ It is a low-overhead tracer with many important real-time compatible features:
 
 However, some settings need to be tuned for it to be fully real-time safe and for performance to be optimal for your use-case:
 
-* timers[^rt-1]: use [read timer](https://lttng.org/docs/v2.11/#doc-channel-read-timer) to avoid a write(2) call
+* timers[^rt-1]: use [read timer](https://lttng.org/docs/v2.13/#doc-channel-read-timer) to avoid a write(2) call
 * sub-buffer[^rt-1] count and size:
-    * see [documentation](https://lttng.org/docs/v2.11/#doc-channel-subbuf-size-vs-subbuf-count) for sub-buffer count and size tuning tips based on your use-case
+    * see [documentation](https://lttng.org/docs/v2.13/#doc-channel-subbuf-size-vs-subbuf-count) for sub-buffer count and size tuning tips based on your use-case
     * minimize sub-buffer count to minimize sub-buffer switching overhead
 * one-time memory allocation/lock/syscall per thread:
     * usually done the first time a tracepoint is executed within a thread for URCU thread registration, but registration can be manually performed to force it to be done during your application's initialization
@@ -168,7 +180,7 @@ However, some settings need to be tuned for it to be fully real-time safe and fo
 
 For further reading:
 
-* [LTTng documentation](https://lttng.org/docs/v2.11/)
+* [LTTng documentation](https://lttng.org/docs/v2.13/)
 * [Combined Tracing of the Kernel and Applications with LTTng](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.641.1965&rep=rep1&type=pdf#page=87): LTTng-UST architecture and design goals (section 3)
 * [Survey and Analysis of Kernel and Userspace Tracers on Linux: Design, Implementation, and Overhead](https://dl.acm.org/doi/abs/10.1145/3158644): LTTng-UST overhead and design compared to other kernel and userspace tracers (table 6: average latency overhead per tracepoint of 158 ns)
 
@@ -210,4 +222,4 @@ Package containing unit and system tests for `tracetools`.
 
 ## Analysis
 
-See [`tracetools_analysis`](https://gitlab.com/ros-tracing/tracetools_analysis).
+See [`tracetools_analysis`](https://github.com/ros-tracing/tracetools_analysis).
