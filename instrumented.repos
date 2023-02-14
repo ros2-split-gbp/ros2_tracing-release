@@ -2,16 +2,16 @@ repositories:
   ros2/rcl:
     type: git
     url: https://github.com/ros2/rcl.git
-    version: humble
+    version: rolling
   ros2/rclcpp:
     type: git
     url: https://github.com/ros2/rclcpp.git
-    version: humble
+    version: rolling
   ros2/rmw_cyclonedds:
     type: git
     url: https://github.com/ros2/rmw_cyclonedds.git
-    version: humble
+    version: rolling
   ros2/rmw_fastrtps:
     type: git
     url: https://github.com/ros2/rmw_fastrtps.git
-    version: humble
+    version: rolling

@@ -2,9 +2,9 @@
 Changelog for package tracetools_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.1.1 (2022-11-07)
+5.0.0 (2023-02-14)
 ------------------
-* Merge branch 'clalancette/release-4.1.0' into 'master'
+* Remove deprecated context_names parameter (`#38 <https://github.com/ros2/ros2_tracing/issues/38>`_)
 * Contributors: Christophe Bedard
 
 4.0.0 (2022-01-20)

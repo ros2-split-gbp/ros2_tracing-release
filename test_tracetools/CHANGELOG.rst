@@ -2,10 +2,10 @@
 Changelog for package test_tracetools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4.1.1 (2022-11-07)
+5.0.0 (2023-02-14)
 ------------------
-* Merge branch 'clalancette/release-4.1.0' into 'master'
-* Contributors: Christophe Bedard
+* Update tracing to C++17. (`#33 <https://github.com/ros2/ros2_tracing/issues/33>`_)
+* Contributors: Chris Lalancette
 
 4.0.0 (2022-01-20)
 ------------------

@@ -1,7 +1,7 @@
 # ros2_tracing
 
-[![pipeline status](https://gitlab.com/ros-tracing/ros2_tracing/badges/master/pipeline.svg)](https://gitlab.com/ros-tracing/ros2_tracing/commits/master)
-[![codecov](https://codecov.io/gl/ros-tracing/ros2_tracing/branch/master/graph/badge.svg)](https://codecov.io/gl/ros-tracing/ros2_tracing)
+[![GitHub CI](https://github.com/ros2/ros2_tracing/actions/workflows/test.yml/badge.svg?branch=rolling)](https://github.com/ros2/ros2_tracing/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/ros2/ros2_tracing/branch/rolling/graph/badge.svg)](https://codecov.io/gh/ros2/ros2_tracing)
 
 Tracing tools for ROS 2.
 
@@ -12,6 +12,8 @@ It also provides [tools to configure tracing](#tracing) through [a launch action
 
 `ros2_tracing` currently only supports the [LTTng](https://lttng.org/) tracer.
 Consequently, it currently only supports Linux.
+
+**Note**: make sure to use the right branch, depending on the ROS 2 distro: [use `rolling` for Rolling, `galactic` for Galactic, etc.](https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Developer-Guide.html#branches)
 
 ## Publications & presentations
 
@@ -36,9 +38,9 @@ If you use or refer to `ros2_tracing`, please cite:
 ```
 </details>
 
-Also, check out the ROS World 2021 presentation titled "Tracing ROS 2 with ros2_tracing" ([video](https://vimeo.com/652633418), [slides](https://gitlab.com/ros-tracing/ros2_tracing/-/raw/master/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)).
+Also, check out the ROS World 2021 presentation titled "Tracing ROS 2 with ros2_tracing" ([video](https://vimeo.com/652633418), [slides](https://github.com/ros2/ros2_tracing/blob/rolling/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)).
 Reference:
-* C. Bédard, "Tracing ROS 2 with ros2_tracing," in *ROS World 2021*. Open Robotics, October 2021. [Online]. Available: https://vimeo.com/652633418, [(pdf)](https://gitlab.com/ros-tracing/ros2_tracing/-/raw/master/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)
+* C. Bédard, "Tracing ROS 2 with ros2_tracing," in *ROS World 2021*. Open Robotics, October 2021. [Online]. Available: https://vimeo.com/652633418, [(pdf)](https://github.com/ros2/ros2_tracing/blob/rolling/doc/2021-10-20_ROS_World_2021_-_Tracing_ROS_2_with_ros2_tracing.pdf)
 
 ## Tutorials & demos
 
@@ -73,7 +75,7 @@ To enable tracing:
     * If you rely on the ROS 2 binaries (Debian packages, release binaries, or prerelease binaries), you will need to clone this repo into your workspace and build at least up to `tracetools`:
         ```
         $ cd src/
-        $ git clone https://gitlab.com/ros-tracing/ros2_tracing.git
+        $ git clone https://github.com/ros2/ros2_tracing.git
         $ cd ../
         $ colcon build --packages-up-to tracetools
         ```
@@ -99,6 +101,12 @@ This will remove all instrumentation from the core ROS 2 packages, and thus they
 The steps above will not lead to trace data being generated, and thus they will have no impact on execution.
 LTTng has to be configured for tracing.
 The packages in this repo provide two options: a [command](#trace-command) and a [launch file action](#launch-file-trace-action).
+
+**Note**: tracing must be started before the application is launched.
+Metadata is recorded during the initialization phase of the application.
+This metadata is needed to understand the rest of the trace data, so if tracing is started after the application started executing, then the trace data might be unusable.
+For more information, refer to the [design document](./doc/design_ros_2.md#general-guidelines).
+The [launch file action](#launch-file-trace-action) is designed to automatically start tracing before the application launches.
 
 The tracing directory can be configured using command/launch action parameters, or through environment variables with the following logic:
 
@@ -214,4 +222,4 @@ Package containing unit and system tests for `tracetools`.
 
 ## Analysis
 
-See [`tracetools_analysis`](https://gitlab.com/ros-tracing/tracetools_analysis).
+See [`tracetools_analysis`](https://github.com/ros-tracing/tracetools_analysis).
