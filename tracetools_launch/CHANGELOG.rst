@@ -2,6 +2,11 @@
 Changelog for package tracetools_launch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+5.0.0 (2023-02-14)
+------------------
+* Remove deprecated context_names parameter (`#38 <https://github.com/ros2/ros2_tracing/issues/38>`_)
+* Contributors: Christophe Bedard
+
 4.0.0 (2022-01-20)
 ------------------
 * Disable kernel tracing by default
