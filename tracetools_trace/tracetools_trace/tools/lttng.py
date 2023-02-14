@@ -26,10 +26,10 @@ try:
     _lttng = lttng_impl  # type: ignore
 
     # Check lttng module version
-    from distutils.version import StrictVersion
+    from packaging.version import Version
     current_version = _lttng.get_version()
     LTTNG_MIN_VERSION = '2.10.7'
-    if current_version is None or current_version < StrictVersion(LTTNG_MIN_VERSION):
+    if current_version is None or current_version < Version(LTTNG_MIN_VERSION):
         print(
             f'lttng module version >={LTTNG_MIN_VERSION} required, found {str(current_version)}',
             file=sys.stderr,
@@ -80,7 +80,7 @@ def is_lttng_installed() -> bool:
     """
     message_doc = (
         'Cannot trace. See documentation at: '
-        'https://gitlab.com/ros-tracing/ros2_tracing'
+        'https://github.com/ros2/ros2_tracing'
     )
     system = platform.system()
     if 'Linux' != system:
