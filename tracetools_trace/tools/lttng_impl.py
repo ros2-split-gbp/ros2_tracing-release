@@ -68,11 +68,14 @@ def setup(
     *,
     session_name: str,
     base_path: str,
+    append_trace: bool = False,
     ros_events: Union[List[str], Set[str]] = DEFAULT_EVENTS_ROS,
     kernel_events: Union[List[str], Set[str]] = [],
     context_fields: Union[List[str], Set[str], Dict[str, List[str]]] = DEFAULT_CONTEXT,
     channel_name_ust: str = 'ros2',
     channel_name_kernel: str = 'kchan',
+    subbuffer_size_ust: int = 8 * 4096,
+    subbuffer_size_kernel: int = 32 * 4096,
 ) -> Optional[str]:
     """
     Set up LTTng session, with events and context.
@@ -82,17 +85,36 @@ def setup(
     Initialization will fail if the list of kernel events to be
     enabled is not empty and if the kernel tracer is not installed.
 
+    Raises RuntimeError on failure, in which case the tracing session might still exist.
+
     :param session_name: the name of the session
-    :param base_path: the path to the directory in which to create the tracing session directory
+    :param base_path: the path to the directory in which to create the tracing session directory,
+        which will be created if needed
+    :param append_trace: whether to append to the trace directory if it already exists, otherwise
+        an error is reported
     :param ros_events: list of ROS events to enable
     :param kernel_events: list of kernel events to enable
     :param context_fields: the names of context fields to enable
         if it's a list or a set, the context fields are enabled for both kernel and userspace;
         if it's a dictionary: { domain type string -> context fields list }
+            with the domain type string being either 'kernel' or 'userspace'
     :param channel_name_ust: the UST channel name
     :param channel_name_kernel: the kernel channel name
+    :param subbuffer_size_ust: the size of the subbuffers for userspace events (defaults to 8 times
+        the usual page size)
+    :param subbuffer_size_kernel: the size of the subbuffers for kernel events (defaults to 32
+        times the usual page size, since there can be way more kernel events than UST events)
     :return: the full path to the trace directory, or `None` if initialization failed
     """
+    # Validate parameters
+    if not session_name:
+        raise RuntimeError('empty session name')
+    # Resolve full tracing directory path
+    full_path = os.path.join(base_path, session_name)
+    if os.path.isdir(full_path) and not append_trace:
+        raise RuntimeError(
+            f'trace directory already exists, use the append option to append to it: {full_path}')
+
     # Check if there is a session daemon running
     if lttng.session_daemon_alive() == 0:
         # Otherwise spawn one and check if it worked
@@ -100,23 +122,21 @@ def setup(
             ['lttng-sessiond', '--daemonize'],
         )
         if lttng.session_daemon_alive() == 0:
-            print('error: failed to start lttng session daemon')
-            return None
+            raise RuntimeError('failed to start lttng session daemon')
 
     # Make sure the kernel tracer is available if there are kernel events
     # Do this after spawning a session daemon, otherwise we can't detect the kernel tracer
     if 0 < len(kernel_events):
         kernel_tracer_available, message = is_kernel_tracer_available()
         if not kernel_tracer_available:
-            print(
-                f'error: kernel tracer is not available: {message}\n'
+            raise RuntimeError(
+                f'kernel tracer is not available: {message}\n'
                 '  cannot use kernel events:\n'
                 "    'ros2 trace' command: cannot use '-k' option\n"
                 "    'Trace' action: cannot set 'events_kernel'/'events-kernel' list\n"
                 '  install the kernel tracer, e.g., on Ubuntu, install lttng-modules-dkms\n'
                 '  see: https://github.com/ros2/ros2_tracing#building'
             )
-            return None
 
     # Convert lists to sets
     if not isinstance(ros_events, set):
@@ -125,9 +145,6 @@ def setup(
         kernel_events = set(kernel_events)
     if isinstance(context_fields, list):
         context_fields = set(context_fields)
-
-    # Resolve full tracing directory path
-    full_path = os.path.join(base_path, session_name)
 
     ust_enabled = ros_events is not None and len(ros_events) > 0
     kernel_enabled = kernel_events is not None and len(kernel_events) > 0
@@ -142,10 +159,9 @@ def setup(
         channel_ust.name = channel_name_ust
         # Discard, do not overwrite
         channel_ust.attr.overwrite = 0
-        # 2 sub-buffers of 8 times the usual page size
         # We use 2 sub-buffers because the number of sub-buffers is pointless in discard mode,
         # and switching between sub-buffers introduces noticeable CPU overhead
-        channel_ust.attr.subbuf_size = 8 * 4096
+        channel_ust.attr.subbuf_size = subbuffer_size_ust
         channel_ust.attr.num_subbuf = 2
         # Ignore switch timer interval and use read timer instead
         channel_ust.attr.switch_timer_interval = 0
@@ -162,9 +178,7 @@ def setup(
         channel_kernel.name = channel_name_kernel
         # Discard, do not overwrite
         channel_kernel.attr.overwrite = 0
-        # 2 sub-buffers of 32 times the usual page size, since
-        # there can be way more kernel events than UST events
-        channel_kernel.attr.subbuf_size = 32 * 4096
+        channel_kernel.attr.subbuf_size = subbuffer_size_kernel
         channel_kernel.attr.num_subbuf = 2
         # Ignore switch timer interval and use read timer instead
         channel_kernel.attr.switch_timer_interval = 0
@@ -173,7 +187,8 @@ def setup(
         channel_kernel.attr.output = lttng.EVENT_MMAP
         events_list_kernel = _create_events(kernel_events)
 
-    # Session
+    # Create session
+    # LTTng will create the parent directories if needed
     _create_session(session_name, full_path)
 
     # Handles, channels, events
@@ -204,6 +219,8 @@ def start(
     """
     Start LTTng session, and check for errors.
 
+    Raises RuntimeError on failure to start.
+
     :param session_name: the name of the session
     """
     result = lttng.start(session_name)
@@ -214,30 +231,38 @@ def start(
 def stop(
     *,
     session_name: str,
+    ignore_error: bool = False,
     **kwargs,
 ) -> None:
     """
     Stop LTTng session, and check for errors.
 
+    Raises RuntimeError on failure to stop, unless ignored.
+
     :param session_name: the name of the session
+    :param ignore_error: whether to ignore any error when stopping
     """
     result = lttng.stop(session_name)
-    if result < 0:
+    if result < 0 and not ignore_error:
         raise RuntimeError(f'failed to stop tracing: {lttng.strerror(result)}')
 
 
 def destroy(
     *,
     session_name: str,
+    ignore_error: bool = False,
     **kwargs,
 ) -> None:
     """
     Destroy LTTng session, and check for errors.
 
+    Raises RuntimeError on failure to stop, unless ignored.
+
     :param session_name: the name of the session
+    :param ignore_error: whether to ignore any error when destroying
     """
     result = lttng.destroy(session_name)
-    if result < 0:
+    if result < 0 and not ignore_error:
         raise RuntimeError(f'failed to destroy tracing session: {lttng.strerror(result)}')
 
 
