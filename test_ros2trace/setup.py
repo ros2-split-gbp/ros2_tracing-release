@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-package_name = 'tracetools_read'
+package_name = 'test_ros2trace'
 
 setup(
     name=package_name,
@@ -13,19 +13,14 @@ setup(
             ['resource/' + package_name]),
     ],
     install_requires=['setuptools'],
-    maintainer=(
-        'Christophe Bedard, '
-        'Ingo Luetkebohle'
-    ),
-    maintainer_email=(
-        'bedard.christophe@gmail.com, '
-        'ingo.luetkebohle@de.bosch.com'
-    ),
+    zip_safe=True,
+    maintainer='Christophe Bedard',
+    maintainer_email='bedard.christophe@gmail.com',
     author='Christophe Bedard',
-    author_email='fixed-term.christophe.bourquebedard@de.bosch.com',
+    author_email='bedard.christophe@gmail.com',
     url='https://github.com/ros2/ros2_tracing',
     keywords=[],
-    description='Tools for reading traces.',
+    description='Tests for the ros2trace package.',
     license='Apache 2.0',
     tests_require=['pytest'],
 )
