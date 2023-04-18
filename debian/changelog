@@ -1,0 +1,45 @@
+ros-rolling-test-tracetools (6.2.0-1bullseye) bullseye; urgency=high
+
+
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Tue, 18 Apr 2023 00:00:00 -0000
+
+ros-rolling-test-tracetools (6.1.0-1bullseye) bullseye; urgency=high
+
+  * Add intra-process tracepoints (#30 <https://github.com/ros2/ros2_tracing/issues/30>)
+  * Contributors: ymski
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 13 Apr 2023 00:00:00 -0000
+
+ros-rolling-test-tracetools (6.0.0-1bullseye) bullseye; urgency=high
+
+  * Allow requiring minimum lttng package version for is_lttng_installed (#59 <https://github.com/ros2/ros2_tracing/issues/59>)
+  * Disable tracing on macOS (#53 <https://github.com/ros2/ros2_tracing/issues/53>)
+  * Include tracepoints by default on Linux (#31 <https://github.com/ros2/ros2_tracing/issues/31>)
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Wed, 12 Apr 2023 00:00:00 -0000
+
+ros-rolling-test-tracetools (5.1.0-1bullseye) bullseye; urgency=high
+
+  * Fix memory leak in tracetools::get_symbol() (#43 <https://github.com/ros2/ros2_tracing/issues/43>)
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 02 Mar 2023 00:00:00 -0000
+
+ros-rolling-test-tracetools (5.0.0-1bullseye) bullseye; urgency=high
+
+  * Update tracing to C++17. (#33 <https://github.com/ros2/ros2_tracing/issues/33>)
+  * Contributors: Chris Lalancette
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Tue, 14 Feb 2023 00:00:00 -0000
+
+ros-rolling-test-tracetools (4.0.0-1bullseye) bullseye; urgency=high
+
+  * Introduce constants for tracepoint names
+  * Move actual tests out of tracetools_test to new test_tracetools package
+  * Contributors: Christophe Bedard
+
+ -- Christophe Bedard <bedard.christophe@gmail.com>  Thu, 20 Jan 2022 00:00:00 -0000
+
+

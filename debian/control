@@ -1,0 +1,12 @@
+Source: ros-rolling-test-tracetools
+Section: misc
+Priority: optional
+Maintainer: Christophe Bedard <bedard.christophe@gmail.com>
+Build-Depends: debhelper (>= 9.0.0), pkg-config, python3-pytest <!nocheck>, python3-pytest-cov <!nocheck>, ros-rolling-ament-cmake, ros-rolling-ament-cmake-gtest <!nocheck>, ros-rolling-ament-cmake-mypy <!nocheck>, ros-rolling-ament-cmake-pytest <!nocheck>, ros-rolling-ament-lint-auto <!nocheck>, ros-rolling-ament-lint-common <!nocheck>, ros-rolling-lifecycle-msgs, ros-rolling-rclcpp, ros-rolling-rclcpp-lifecycle, ros-rolling-std-msgs, ros-rolling-std-srvs, ros-rolling-tracetools <!nocheck>, ros-rolling-tracetools-test <!nocheck>, ros-rolling-ros-workspace
+Homepage: https://github.com/ros2/ros2_tracing
+Standards-Version: 3.9.2
+
+Package: ros-rolling-test-tracetools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-rolling-lifecycle-msgs, ros-rolling-rclcpp, ros-rolling-rclcpp-lifecycle, ros-rolling-std-msgs, ros-rolling-std-srvs, ros-rolling-ros-workspace
+Description: Tests for the tracetools package.
