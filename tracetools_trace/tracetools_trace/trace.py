@@ -16,6 +16,7 @@
 
 """Entrypoint/script to setup and start an LTTng tracing session."""
 
+import argparse
 import os
 import sys
 from typing import List
@@ -32,6 +33,7 @@ def init(
     *,
     session_name: str,
     base_path: Optional[str],
+    append_trace: bool,
     ros_events: List[str],
     kernel_events: List[str],
     context_fields: List[str],
@@ -40,9 +42,13 @@ def init(
     """
     Init and start tracing.
 
+    Raises RuntimeError on failure, in which case the tracing session might still exist.
+
     :param session_name: the name of the session
     :param base_path: the path to the directory in which to create the tracing session directory,
         or `None` for default
+    :param append_trace: whether to append to the trace directory if it already exists, otherwise
+        an error is reported
     :param ros_events: list of ROS events to enable
     :param kernel_events: list of kernel events to enable
     :param context_fields: list of context fields to enable
@@ -81,6 +87,7 @@ def init(
     trace_directory = lttng.lttng_init(
         session_name=session_name,
         base_path=base_path,
+        append_trace=append_trace,
         ros_events=ros_events,
         kernel_events=kernel_events,
         context_fields=context_fields,
@@ -111,19 +118,44 @@ def fini(
     signals.execute_and_handle_sigint(_run, _fini)
 
 
-def main() -> int:
-    params = args.parse_args()
+def cleanup(
+    *,
+    session_name: str,
+) -> None:
+    """
+    Clean up and remove tracing session if it exists.
 
-    if not init(
-        session_name=params.session_name,
-        base_path=params.path,
-        ros_events=params.events_ust,
-        kernel_events=params.events_kernel,
-        context_fields=params.context_fields,
-        display_list=params.list,
-    ):
+    :param session_name: the name of the session
+    """
+    lttng.lttng_fini(session_name=session_name, ignore_error=True)
+
+
+def trace(args: argparse.Namespace) -> int:
+    """
+    Trace.
+
+    :param args: the arguments parsed using `tracetools_trace.tools.args`
+    :return: the return code (0 if successful, 1 otherwise)
+    """
+    try:
+        if not init(
+            session_name=args.session_name,
+            base_path=args.path,
+            append_trace=args.append_trace,
+            ros_events=args.events_ust,
+            kernel_events=args.events_kernel,
+            context_fields=args.context_fields,
+            display_list=args.list,
+        ):
+            return 1
+        fini(session_name=args.session_name)
+        return 0
+    except RuntimeError as e:
+        print(f'error: {str(e)}', file=sys.stderr)
+        # Make sure to clean up tracing session
+        cleanup(session_name=args.session_name)
         return 1
-    fini(
-        session_name=params.session_name,
-    )
-    return 0
+
+
+def main() -> int:
+    return trace(args.parse_args())
